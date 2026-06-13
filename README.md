@@ -20,7 +20,7 @@
 - Backend: Flask (Python)
 - Database: SQLite
 - Frontend: HTML, CSS, Jinja2
-- ORM: Flask-SQLAlchemy (if used)
+- ORM: Flask-SQLAlchemy
 
 --------------------------------------------------------------------------------------------------------------------
 
