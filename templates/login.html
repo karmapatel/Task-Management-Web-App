@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Login Page
+{% endblock %}
+
+{% block content %}
+    <div id="auth-box">
+        <form action="/" method="POST" class=".form-container">
+            <h2>Login</h2>
+            <input type="text" name="email" placeholder="Enter your Email"><br>
+            <input type="password" name="password" placeholder="Enter your Password"><br>
+            <input type="submit" value="Login"><br>
+            <a href="/register">Don't have an account? Create Here</a>
+        </form>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p class="flash-message">{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+{% endblock %}

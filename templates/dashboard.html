@@ -1,0 +1,107 @@
+
+
+{% extends 'base.html' %}
+
+{% block navbar %}
+    <a href="{{ url_for('logout') }}" id="logout">Logout</a>
+{% endblock %}
+
+{% block content %}
+
+    <h3 id="name">Welcome, {{ currentUser.name }}!</h3>
+
+    <form action="{{ url_for('add_task') }}" method="POST" class="combobox-wrapper">
+
+        <input
+            type="text"
+            name="title"
+            placeholder="Enter Task"
+            autocomplete="off"
+            required
+        >
+
+        <select name="to" required>
+            <option value="">Assign To</option>
+
+            {% for user in users %}
+                {% if user.name != currentUser.name %}
+                    <option value="{{ user.name }}">
+                        {{ user.name }}
+                    </option>
+                {% endif %}
+            {% endfor %}
+        </select>
+
+        <input type="submit" value="Assign Task">
+
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p id="task-flash">{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="my-tasks">
+
+        <h3 id="mt-heading">My Tasks</h3>
+
+        <div class="pending-tasks">
+
+            <p>Pending</p>
+
+            {% if pending %}
+
+                {% for task in pending %}
+
+                    <p><strong>{{ task.title }}</strong></p>
+                    <p>Assigned By: {{ task.creator.name }}</p>
+                    <p>Status: {{ task.status }}</p>
+
+                    <form action="{{ url_for('complete_task', task_id=task.id) }}" method="POST">
+                        <input type="submit" value="Mark Complete">
+                    </form>
+
+                    <hr>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>No Pending Tasks</p>
+
+            {% endif %}
+
+        </div>
+
+        <div class="completed-tasks">
+
+            <p>Completed</p>
+
+            {% if completed %}
+
+                {% for task in completed %}
+
+                    <p><strong>{{ task.title }}</strong></p>
+                    <p>Assigned By: {{ task.creator.name }}</p>
+                    <p>Status: {{ task.status }}</p>
+
+                    <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST">
+                        <input type="submit" value="Delete">
+                    </form>
+                    <hr>
+                {% endfor %}
+
+            {% else %}
+
+                <p>No Completed Tasks</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+{% endblock %}

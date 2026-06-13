@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}
+    Register Page
+{% endblock %}
+
+{% block content %}
+    <div id="auth-box">
+        <form action="/register" method="POST" class=".form-container">
+            <h2>Register</h2>
+            <input type="text" name="username" placeholder="Enter your Name"><br>
+            <input type="text" name="email" placeholder="Enter your Email"><br>
+            <input type="password" name="password" placeholder="Set a Password"><br>
+            <input type="submit" value="Register"><br>
+        <a href="/">Already have an account? Login Here</a>
+        </form>
+    </div>
+{% endblock %}
