@@ -31,7 +31,7 @@
                 {% endif %}
             {% endfor %}
         </select>
-
+        <input type="date" name="due_date" placeholder="Target Date" required>
         <input type="submit" value="Assign Task">
 
     </form>
@@ -43,6 +43,13 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+<div class="task-tabs">
+    <input type="radio" id="mytasks" name="tabs" checked>
+    <input type="radio" id="allocated" name="tabs">
+     <div class="tab-buttons">
+        <label for="mytasks">My Tasks</label>
+        <label for="allocated">Allocated Tasks</label>
+    </div>
 
     <div class="my-tasks">
 
@@ -59,8 +66,10 @@
                     <p><strong>{{ task.title }}</strong></p>
                     <p>Assigned By: {{ task.creator.name }}</p>
                     <p>Status: {{ task.status }}</p>
+                    <p>Created: {{ task.created_date }}</p>
+                    <p>Due: {{ task.due_date }}</p> 
 
-                    <form action="{{ url_for('complete_task', task_id=task.id) }}" method="POST">
+                    <form action="{{ url_for('complete_task', task_id=task.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to mark this task as completed?')">
                         <input type="submit" value="Mark Complete">
                     </form>
 
@@ -87,10 +96,9 @@
                     <p><strong>{{ task.title }}</strong></p>
                     <p>Assigned By: {{ task.creator.name }}</p>
                     <p>Status: {{ task.status }}</p>
-
-                    <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST">
-                        <input type="submit" value="Delete">
-                    </form>
+                    <p>Created: {{ task.created_date }}</p>
+                    <p>Due: {{ task.due_date }}</p>
+                    <p>Completed: {{ task.completed_date }}</p>
                     <hr>
                 {% endfor %}
 
@@ -104,4 +112,56 @@
 
     </div>
 
+    <div class="created-tasks">
+
+        <h3 id="mt-heading">Allocated Tasks</h3>
+        <div class="pending-tasks">
+
+            <p>Pending</p>
+
+            {% if created_pending %}
+
+                {% for task in created_pending %}
+
+                    <p><strong>{{ task.title }}</strong></p>
+                    <p>Assigned To: {{ task.assignee.name }}</p>
+                    <p>Status: {{ task.status }}</p>
+                    <p>Created: {{ task.created_date }}</p>
+                    <p>Due: {{ task.due_date }}</p> 
+                    <hr>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>No Pending Tasks</p>
+
+            {% endif %}
+
+        </div>
+        <div class="completed-tasks">
+
+            <p>Completed</p>
+
+            {% if created_completed %}
+
+                {% for task in created_completed %}
+
+                    <p><strong>{{ task.title }}</strong></p>
+                    <p>Assigned To: {{ task.assignee.name }}</p>
+                    <p>Status: {{ task.status }}</p>
+                    <p>Created: {{ task.created_date }}</p>
+                    <p>Due: {{ task.due_date }}</p>
+                    <p>Completed: {{ task.completed_date }}</p>
+                    <hr>
+                {% endfor %}
+
+            {% else %}
+
+                <p>No Completed Tasks</p>
+
+            {% endif %}
+
+        </div>
+</div>
 {% endblock %}

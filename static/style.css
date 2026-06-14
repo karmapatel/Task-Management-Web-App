@@ -58,13 +58,17 @@ nav a:hover {
 }
 
 #auth-box {
-    width: 350px;
+    width: 90%;
+    max-width: 400px;
+
     margin: 80px auto;
-    padding: 30px;
+    padding: 60px;
+
     background-color: white;
     border: 1px solid #d1d5db;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
     text-align: center;
 }
 
@@ -141,6 +145,7 @@ nav a:hover {
 }
 
 .combobox-wrapper input[type="text"],
+.combobox-wrapper input[type="date"],
 .combobox-wrapper select {
     padding: 10px;
     border: 1px solid #d1d5db;
@@ -162,7 +167,7 @@ input[type="submit"]:hover {
     background-color: #1d4ed8;
 }
 
-.my-tasks {
+.my-tasks,.created-tasks {
     display: flex;
     gap: 30px;
     margin: 30px 40px;
@@ -210,12 +215,85 @@ footer {
 }
 
 @media (max-width: 768px) {
-    .my-tasks {
-        flex-direction: column;
+
+    header,
+    nav {
+        padding: 15px 20px;
+    }
+
+    #name {
+        margin: 15px 20px;
     }
 
     .combobox-wrapper {
+        margin: 15px 20px;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
     }
+
+    .combobox-wrapper input[type="text"],
+    .combobox-wrapper select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .my-tasks,
+    .created-tasks {
+        flex-direction: column;
+        margin: 20px;
+    }
+
+    .pending-tasks,
+    .completed-tasks {
+        max-height: none;
+    }
+
+    header h2 {
+        font-size: 20px;
+    }
+
+    header a,
+    nav a {
+        font-size: 14px;
+    }
+}
+
+
+.task-tabs input[type="radio"]{
+    display:none;
+}
+
+.tab-buttons{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    margin:30px 0;
+}
+
+.task-tabs label{
+    padding:12px 24px;
+    background:#dbeafe;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+#mytasks:checked + label,
+#allocated:checked + label{
+    background:#2563eb;
+    color:white;
+}
+
+.my-tasks,
+.created-tasks{
+    display:none;
+}
+
+#mytasks:checked ~ .my-tasks{
+    display:flex;
+}
+
+#allocated:checked ~ .created-tasks{
+    display:flex;
 }

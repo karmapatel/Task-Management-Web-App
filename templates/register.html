@@ -13,5 +13,12 @@
             <input type="submit" value="Register"><br>
         <a href="/">Already have an account? Login Here</a>
         </form>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p class="flash-message">{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
     </div>
 {% endblock %}
