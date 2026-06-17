@@ -33,8 +33,8 @@ class Task(db.Model):
     due_date = db.Column(db.Date,nullable=False)
     completed_date = db.Column(db.Date,nullable=True)
 
-with app.app_context():
-    db.create_all() #--> this increases cold start latency by 2-5 secs , thus create DB Manually
+# with app.app_context():
+#     db.create_all() #--> this increases cold start latency by 2-5 secs , thus create DB Manually
 
 #Login
 @app.route('/', methods=['GET','POST'])
