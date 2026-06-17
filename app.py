@@ -25,7 +25,7 @@ class User(db.Model):
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
+    title = db.Column(db.String(850), nullable=False)
     assigned_to = db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
     assigned_by = db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
     status = db.Column(db.String(20),default="Pending")
@@ -33,8 +33,8 @@ class Task(db.Model):
     due_date = db.Column(db.Date,nullable=False)
     completed_date = db.Column(db.Date,nullable=True)
 
-# with app.app_context():
-#     db.create_all() --> this increases cold start latency by 2-5 secs , thus create DB Manually
+with app.app_context():
+    db.create_all() #--> this increases cold start latency by 2-5 secs , thus create DB Manually
 
 #Login
 @app.route('/', methods=['GET','POST'])
@@ -62,7 +62,7 @@ def login():
 def register():
     if request.method == 'POST':
         try:
-            userName = request.form.get('username')
+            userName = request.form.get('full_name')
             email = request.form.get('email')
             password = bcrypt.generate_password_hash(request.form.get('password')).decode('utf-8')
 
@@ -135,13 +135,21 @@ def add_task():
         name=assigned_to_name
     ).first()
 
-    due_date = datetime.strptime(
-        request.form.get("due_date"),
-        "%Y-%m-%d"
-    ).date()
+    try:
+        due_date = datetime.strptime(
+            request.form.get("due_date"),
+            "%Y-%m-%d"
+        ).date()
+    except:
+        flash('Please enter Target Date')
+        return redirect(url_for('dashboard'))
+
+    if title == None or title == "":
+        flash('Please enter Task name')
+        return redirect(url_for('dashboard'))
 
     if not assigned_user:
-        flash("User not found")
+        flash("Please select user")
         return redirect(url_for('dashboard'))
 
     new_task = Task(
@@ -199,7 +207,7 @@ def complete_task(task_id):
 @app.route("/logout")
 def logout():
     if "user_id" in session:
-        session.pop('user_id')
+        session.clear()
         return redirect(url_for('login'))
     else:
         return redirect(url_for('login'))

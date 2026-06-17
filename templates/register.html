@@ -1,24 +1,225 @@
-{% extends 'base.html' %}
-{% block title %}
-    Register Page
-{% endblock %}
+<!DOCTYPE html><html class="light" lang="en" ><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Register | TaskFlow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .flash-message {
+    width: fit-content;
+    margin: 15px auto;
+    padding: 10px 20px;
+    background-color: rgba(239, 68, 68, 0.12);
+    color: #b91c1c;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+}
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-primary-container": "#7c839b",
+                        "primary-container": "#131b2e",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-tertiary-container": "#009668",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#6ffbbe",
+                        "secondary-container": "#2170e4",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#d3e4fe",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-high": "#dce9ff",
+                        "on-tertiary-fixed": "#002113",
+                        "outline": "#76777d",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary-fixed": "#dae2fd",
+                        "primary": "#000000",
+                        "outline-variant": "#c6c6cd",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#45464d",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "tertiary-container": "#002113",
+                        "tertiary": "#000000",
+                        "surface-tint": "#565e74",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#bec6e0",
+                        "surface-container": "#e5eeff",
+                        "on-secondary-fixed": "#001a42",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "secondary": "#0058be",
+                        "background": "#f8f9ff",
+                        "surface": "#f8f9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#d8e2ff",
+                        "on-primary-fixed": "#131b2e",
+                        "on-background": "#0b1c30",
+                        "on-secondary-container": "#fefcff",
+                        "on-surface": "#0b1c30",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "base": "4px",
+                        "max-width": "1440px",
+                        "xs": "4px",
+                        "margin": "32px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col min-h-screen">
+<!-- Top Navigation Shell (Hidden for Transactional Context per Mandate) -->
+<!-- The TopNavBar is excluded because this is a Transactional "Login/Sign-up" screen -->
+ <nav class="relative z-20 w-full h-16 border-b border-outline-variant bg-surface flex items-center px-xl">
+<img alt="TaskFlow Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLvK2fvhGH9MrPg5Ch8M30QoB0yXBYZhz8CTc1O3eQyiMtJS1Bwptc7ub5drEvQqxph8IqayYk5J-XbcbEi6aFS-Jxm7bIRbcs0hvz67Qu0xXaAlcIsTLEohqBiLqCFThg2awaP5BsmXsriuMv6kfoKxgourDSSm9hxDPGnUS8d-i7f2_jdVev_4J8A8F_4zt_Z47X-szKPlN_f9VGTnPKhq9jmH0DqTUZrMIIqnYPla0zzXPe_Ps4aY1uU"/>
+</nav>
+<main class="flex-grow flex items-center justify-center px-md py-xl relative overflow-hidden">
+<!-- Atmospheric Background Element -->
+<div class="absolute inset-0 z-0 opacity-40 pointer-events-none">
+<div class="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-secondary-fixed opacity-20 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-primary-fixed opacity-20 blur-[120px] rounded-full"></div>
+</div>
+<!-- Registration Card -->
+<div class="relative z-10 w-full max-w-[480px] bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0px_4px_6px_-1px_rgba(15,23,42,0.1)] p-xl">
+<!-- Brand Identity -->
+<div class="flex flex-col items-center mb-xl">
+<img alt="TaskFlow Logo" class="w-16 h-16 mb-md" src="https://lh3.googleusercontent.com/aida/AP1WRLvK2fvhGH9MrPg5Ch8M30QoB0yXBYZhz8CTc1O3eQyiMtJS1Bwptc7ub5drEvQqxph8IqayYk5J-XbcbEi6aFS-Jxm7bIRbcs0hvz67Qu0xXaAlcIsTLEohqBiLqCFThg2awaP5BsmXsriuMv6kfoKxgourDSSm9hxDPGnUS8d-i7f2_jdVev_4J8A8F_4zt_Z47X-szKPlN_f9VGTnPKhq9jmH0DqTUZrMIIqnYPla0zzXPe_Ps4aY1uU">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Create Account</h1>
+<!-- <p class="font-body-md text-body-md text-on-surface-variant mt-base">Join TaskFlow and streamline your workflow today.</p> -->
+</div>
+<!-- Form -->
+<form action="#" class="space-y-lg" method="POST">
+<!-- Full Name -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-sm" for="email">FULL NAME</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">person</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3 pl-10 pr-md font-body-md text-body-md text-on-surface input-focus-ring transition-all" id="full_name" name="full_name" placeholder="Enter your Name" required="" type="text"/>
+</div>
+</div>
+<!-- Email Field -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-sm" for="email">EMAIL ADDRESS</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">mail</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3 pl-10 pr-md font-body-md text-body-md text-on-surface input-focus-ring transition-all" id="email" name="email" placeholder="name@company.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-sm" for="password">PASSWORD</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">lock</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3 pl-10 pr-md font-body-md text-body-md text-on-surface input-focus-ring transition-all" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- Terms -->
 
-{% block content %}
-    <div id="auth-box">
-        <form action="/register" method="POST" class=".form-container">
-            <h2>Register</h2>
-            <input type="text" name="username" placeholder="Enter your Name"><br>
-            <input type="text" name="email" placeholder="Enter your Email"><br>
-            <input type="password" name="password" placeholder="Set a Password"><br>
-            <input type="submit" value="Register"><br>
-        <a href="/">Already have an account? Login Here</a>
-        </form>
-        {% with messages = get_flashed_messages() %}
+<!-- Action Button -->
+<button class="w-full bg-secondary text-on-secondary font-headline-md text-headline-md py-md px-lg rounded-lg shadow-sm hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-base" type="submit">
+                    Create Account
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</form>
+{% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for msg in messages %}
                 <p class="flash-message">{{ msg }}</p>
             {% endfor %}
         {% endif %}
         {% endwith %}
-    </div>
-{% endblock %}
+<!-- Social/Divider -->
+
+<!-- Social Actions -->
+
+<!-- Footer Link -->
+<div class="mt-xl text-center">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Already have an account? 
+                    <a class="text-secondary font-semibold hover:underline" href="/">Login</a>
+</p>
+</div>
+</div>
+</main>
+<!-- Footer Scripted Component -->
+<footer class="bg-surface-container-low border-t border-outline-variant">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin py-xl w-full max-w-max-width mx-auto gap-md">
+<div class="font-headline-md text-headline-md text-on-surface font-bold">TaskFlow</div><div class="font-body-md text-body-md text-on-surface-variant">Contact Us <a href="mailto:karmapatel4@gmail.com" style="text-decoration: none; color: inherit;">karmapatel4@gmail.com</a></div>
+
+<div class="font-label-md text-label-md text-on-surface-variant opacity-70">
+                © 2026 TaskFlow Made by Karma Patel.
+            </div>
+</div>
+</footer>
+<script>
+        // Micro-interaction for input focus
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                const icon = input.previousElementSibling;
+                if (icon && icon.classList.contains('material-symbols-outlined')) {
+                    icon.style.color = '#3B82F6';
+                    icon.style.transition = 'color 0.2s ease';
+                }
+            });
+            input.addEventListener('blur', () => {
+                const icon = input.previousElementSibling;
+                if (icon && icon.classList.contains('material-symbols-outlined')) {
+                    icon.style.color = '#76777d';
+                }
+            });
+        });
+    </script>
+
+
+</body></html>

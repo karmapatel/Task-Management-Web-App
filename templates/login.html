@@ -1,24 +1,221 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
 
-{% block title %}
-    Login Page
-{% endblock %}
-
-{% block content %}
-    <div id="auth-box">
-        <form action="/" method="POST" class=".form-container">
-            <h2>Login</h2>
-            <input type="text" name="email" placeholder="Enter your Email"><br>
-            <input type="password" name="password" placeholder="Enter your Password"><br>
-            <input type="submit" value="Login"><br>
-            <a href="/register">Don't have an account? Create Here</a>
-        </form>
-        {% with messages = get_flashed_messages() %}
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | TaskFlow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-container": "#7c839b",
+                    "tertiary-fixed": "#6ffbbe",
+                    "primary-fixed": "#dae2fd",
+                    "outline-variant": "#c6c6cd",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "on-secondary-container": "#fefcff",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-tertiary-container": "#009668",
+                    "on-secondary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed": "#d8e2ff",
+                    "on-secondary-fixed": "#001a42",
+                    "tertiary-container": "#002113",
+                    "surface-container-low": "#eff4ff",
+                    "on-background": "#0b1c30",
+                    "surface-variant": "#d3e4fe",
+                    "surface-container": "#e5eeff",
+                    "outline": "#76777d",
+                    "surface": "#f8f9ff",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "surface-container-high": "#dce9ff",
+                    "secondary-container": "#2170e4",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-primary-fixed": "#131b2e",
+                    "error-container": "#ffdad6",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#bec6e0",
+                    "primary": "#000000",
+                    "surface-dim": "#cbdbf5",
+                    "on-surface-variant": "#45464d",
+                    "primary-fixed-dim": "#bec6e0",
+                    "on-secondary-fixed-variant": "#004395",
+                    "inverse-surface": "#213145",
+                    "on-tertiary": "#ffffff",
+                    "secondary": "#0058be",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#000000",
+                    "primary-container": "#131b2e",
+                    "surface-tint": "#565e74",
+                    "background": "#f8f9ff",
+                    "surface-bright": "#f8f9ff",
+                    "on-surface": "#0b1c30",
+                    "on-tertiary-fixed": "#002113"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "margin": "32px",
+                    "base": "4px",
+                    "gutter": "24px",
+                    "max-width": "1440px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "headline-xl": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .login-card {
+            box-shadow: 0px 4px 6px -1px rgba(15, 23, 42, 0.1);
+        }
+        .input-focus-ring:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 88, 190, 0.2);
+            border-color: #0058be;
+        }
+        .flash-message {
+    width: fit-content;
+    margin: 15px auto;
+    padding: 10px 20px;
+    background-color: rgba(239, 68, 68, 0.12);
+    color: #b91c1c;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+}
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-background text-on-background relative">
+<!-- Atmospheric Background Pulse -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] opacity-20 transition-opacity duration-1000 ease-in-out" id="bg-pulse" style="background: radial-gradient(circle, rgba(0, 88, 190, 0.05) 0%, transparent 70%);">
+</div>
+</div>
+<!-- Top Navigation Bar -->
+<nav class="relative z-20 w-full h-16 border-b border-outline-variant bg-surface flex items-center px-xl">
+<img alt="TaskFlow Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLvK2fvhGH9MrPg5Ch8M30QoB0yXBYZhz8CTc1O3eQyiMtJS1Bwptc7ub5drEvQqxph8IqayYk5J-XbcbEi6aFS-Jxm7bIRbcs0hvz67Qu0xXaAlcIsTLEohqBiLqCFThg2awaP5BsmXsriuMv6kfoKxgourDSSm9hxDPGnUS8d-i7f2_jdVev_4J8A8F_4zt_Z47X-szKPlN_f9VGTnPKhq9jmH0DqTUZrMIIqnYPla0zzXPe_Ps4aY1uU"/>
+</nav>
+<!-- Main Content Canvas - Perfectly Centered -->
+<main class="relative z-10 flex-grow flex items-center justify-center p-md">
+<div class="w-full max-w-md">
+<!-- Branding Section within Main Area -->
+<div class="flex flex-col items-center mb-xl">
+<div class="mb-md">
+<img alt="TaskFlow Logo" class="w-16 h-16 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLvK2fvhGH9MrPg5Ch8M30QoB0yXBYZhz8CTc1O3eQyiMtJS1Bwptc7ub5drEvQqxph8IqayYk5J-XbcbEi6aFS-Jxm7bIRbcs0hvz67Qu0xXaAlcIsTLEohqBiLqCFThg2awaP5BsmXsriuMv6kfoKxgourDSSm9hxDPGnUS8d-i7f2_jdVev_4J8A8F_4zt_Z47X-szKPlN_f9VGTnPKhq9jmH0DqTUZrMIIqnYPla0zzXPe_Ps4aY1uU"/>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">TaskFlow</h1>
+<!-- <p class="font-body-md text-body-md text-on-surface-variant mt-xs">Deep focus for data-driven teams.</p> -->
+</div>
+<!-- Central Login Card -->
+<div class="bg-surface-container-lowest login-card border border-outline-variant rounded-xl p-xl">
+<form action="#" class="space-y-lg" method="POST">
+<!-- Email Field -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-sm" for="email">EMAIL ADDRESS</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">mail</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3 pl-10 pr-md font-body-md text-body-md text-on-surface input-focus-ring transition-all" id="email" name="email" placeholder="name@company.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-sm" for="password">PASSWORD</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">lock</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3 pl-10 pr-md font-body-md text-body-md text-on-surface input-focus-ring transition-all" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- Primary Action -->
+<button class="w-full bg-secondary text-on-secondary font-headline-md text-headline-md py-3 rounded-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-sm" type="submit">
+                        Login
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</form>
+{% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for msg in messages %}
                 <p class="flash-message">{{ msg }}</p>
             {% endfor %}
         {% endif %}
         {% endwith %}
-    </div>
-{% endblock %}
+<div class="mt-xl text-center">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Dont Have an Account? 
+                    <a class="text-secondary font-semibold hover:underline" href="/register">Register</a>
+</p>
+</div>
+</div>
+</main>
+</div>
+</div>
+</main>
+<!-- Footer - Strictly Anchored -->
+<footer class="bg-surface-container-low border-t border-outline-variant">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin py-xl w-full max-w-max-width mx-auto gap-md">
+<div class="font-headline-md text-headline-md text-on-surface font-bold">TaskFlow</div><div class="font-body-md text-body-md text-on-surface-variant">Contact Us <a href="mailto:karmapatel4@gmail.com" style="text-decoration: none; color: inherit;">karmapatel4@gmail.com</a></div>
+
+<div class="font-label-md text-label-md text-on-surface-variant opacity-70">
+                © 2026 TaskFlow Made by Karma Patel.
+            </div>
+</div>
+</footer>
+<!-- Simple Micro-interaction Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pulse = document.getElementById('bg-pulse');
+            let opacity = 0.1;
+            let direction = 1;
+
+            setInterval(() => {
+                if (opacity >= 0.25) direction = -1;
+                if (opacity <= 0.08) direction = 1;
+                opacity += 0.002 * direction;
+                pulse.style.opacity = opacity;
+            }, 50);
+        });
+    </script>
+</body></html>

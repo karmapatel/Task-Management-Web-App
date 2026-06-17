@@ -1,167 +1,434 @@
+<!DOCTYPE html>
 
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TaskFlow Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "primary-container": "#131b2e",
+                "tertiary-fixed-dim": "#4edea3",
+                "on-tertiary": "#ffffff",
+                "outline": "#76777d",
+                "secondary-container": "#2170e4",
+                "on-tertiary-fixed": "#002113",
+                "tertiary": "#000000",
+                "inverse-surface": "#213145",
+                "on-primary": "#ffffff",
+                "tertiary-fixed": "#6ffbbe",
+                "background": "#f8f9ff",
+                "surface": "#f8f9ff",
+                "surface-variant": "#d3e4fe",
+                "inverse-primary": "#bec6e0",
+                "tertiary-container": "#002113",
+                "surface-container-low": "#eff4ff",
+                "on-secondary": "#ffffff",
+                "on-tertiary-container": "#009668",
+                "error-container": "#ffdad6",
+                "surface-bright": "#f8f9ff",
+                "primary-fixed-dim": "#bec6e0",
+                "surface-container-highest": "#d3e4fe",
+                "surface-container-high": "#dce9ff",
+                "on-secondary-container": "#fefcff",
+                "on-secondary-fixed": "#001a42",
+                "on-primary-container": "#7c839b",
+                "surface-container-lowest": "#ffffff",
+                "on-error-container": "#93000a",
+                "on-tertiary-fixed-variant": "#005236",
+                "on-background": "#0b1c30",
+                "surface-tint": "#565e74",
+                "on-primary-fixed": "#131b2e",
+                "inverse-on-surface": "#eaf1ff",
+                "on-surface": "#0b1c30",
+                "on-error": "#ffffff",
+                "error": "#ba1a1a",
+                "outline-variant": "#c6c6cd",
+                "surface-container": "#e5eeff",
+                "surface-dim": "#cbdbf5",
+                "primary": "#000000",
+                "primary-fixed": "#dae2fd",
+                "on-surface-variant": "#45464d",
+                "on-primary-fixed-variant": "#3f465c",
+                "secondary-fixed-dim": "#adc6ff",
+                "secondary": "#0058be",
+                "on-secondary-fixed-variant": "#004395",
+                "secondary-fixed": "#d8e2ff"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "md": "16px",
+                "sm": "8px",
+                "xs": "4px",
+                "max-width": "1440px",
+                "base": "4px",
+                "gutter": "24px",
+                "margin": "32px",
+                "lg": "24px",
+                "xl": "32px"
+            },
+            "fontFamily": {
+                "body-lg": ["Inter"],
+                "label-md": ["Inter"],
+                "headline-md": ["Inter"],
+                "headline-xl": ["Inter"],
+                "headline-lg": ["Inter"],
+                "body-md": ["Inter"],
+                "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .status-chip-completed { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .status-chip-pending { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .status-chip-overdue { background-color: rgba(244, 63, 94, 0.1); color: #f43f5e; }
 
-{% extends 'base.html' %}
+        .collapse-content {
+            transition: max-height 0.3s ease-out, opacity 0.2s ease-in;
+            overflow: hidden;
+        }
+        .collapse-content.collapsed {
+            max-height: 0 !important;
+            opacity: 0;
+            pointer-events: none;
+        }
 
-{% block navbar %}
-    <a href="{{ url_for('logout') }}" id="logout">Logout</a>
-{% endblock %}
-
-{% block content %}
-
-    <h3 id="name">Welcome, {{ currentUser.name }}!</h3>
-
-    <form action="{{ url_for('add_task') }}" method="POST" class="combobox-wrapper">
-
-        <input
-            type="text"
-            name="title"
-            placeholder="Enter Task"
-            autocomplete="off"
-            required
-        >
-
-        <select name="to" required>
-            <option value="">Assign To</option>
-
-            {% for user in users %}
-                {% if user.name != currentUser.name %}
-                    <option value="{{ user.name }}">
-                        {{ user.name }}
-                    </option>
-                {% endif %}
-            {% endfor %}
-        </select>
-        <input type="date" name="due_date" placeholder="Target Date" required>
-        <input type="submit" value="Assign Task">
-
-    </form>
-
-    {% with messages = get_flashed_messages() %}
+#task-flash {
+    width: fit-content;
+    margin: 15px auto;
+    padding: 10px 20px;
+    background-color: #E3F2FD;
+    color: #0D47A1;
+    border: 1px solid #0A3680;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+}
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased">
+<!-- TopNavBar Component -->
+<header class="bg-surface-container-lowest border-b border-outline-variant fixed top-0 left-0 w-full z-50 h-16">
+<div class="flex justify-between items-center w-full px-margin h-full max-w-max-width mx-auto">
+<div class="flex items-center gap-xl">
+<div class="flex items-center gap-sm">
+<img alt="Logo" class="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLvK2fvhGH9MrPg5Ch8M30QoB0yXBYZhz8CTc1O3eQyiMtJS1Bwptc7ub5drEvQqxph8IqayYk5J-XbcbEi6aFS-Jxm7bIRbcs0hvz67Qu0xXaAlcIsTLEohqBiLqCFThg2awaP5BsmXsriuMv6kfoKxgourDSSm9hxDPGnUS8d-i7f2_jdVev_4J8A8F_4zt_Z47X-szKPlN_f9VGTnPKhq9jmH0DqTUZrMIIqnYPla0zzXPe_Ps4aY1uU"/>
+<span class="text-headline-md font-headline-md font-bold text-secondary">TaskFlow</span>
+</div>
+<!-- Top Navigation Links -->
+<nav class="hidden md:flex items-center gap-lg ml-xl">
+<button class="text-label-md font-bold px-md py-sm rounded-lg bg-secondary-container text-on-secondary-container transition-all" id="navMyTasks">My Tasks</button>
+<button class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" id="navAllocatedTasks">Allocated Tasks</button>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-body-md font-label-md text-on-surface-variant hover:text-error transition-colors px-sm py-xs"><a href="{{ url_for('logout') }}">Logout</a></button>
+</div>
+</div>
+</header>
+<!-- Main Content Area - Full Width -->
+<main class="pt-24 pb-margin px-margin max-w-max-width mx-auto min-h-screen" id="mainContent">
+<!-- Welcome Section -->
+<section class="mb-xl">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Welcome back, {{ currentUser.name }}</h1>
+</div>
+</div>
+</section>
+<!-- Task Input Form -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-xl">
+<h2 class="text-label-md font-bold mb-md uppercase tracking-wider text-on-surface-variant">Quick Create Task</h2>
+<form action="{{ url_for('add_task') }}" class="grid grid-cols-1 md:grid-cols-4 gap-md items-end" method="POST">
+<div class="flex flex-col gap-xs">
+<label class="text-label-md text-on-surface-variant ml-xs">Task Name</label>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-md py-sm focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md" name="title" placeholder="Enter Task" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-md text-on-surface-variant ml-xs">Assign To</label>
+<select class="w-full bg-surface border border-outline-variant rounded-lg px-md py-sm focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md appearance-none" name="to">
+<option disabled="" selected="" value="">Select Team Member</option>
+{% for user in users %}
+    {% if user.name != currentUser.name %}
+        <option value="{{ user.name }}">
+             {{ user.name }}
+        </option>
+    {% endif %}
+{% endfor %}
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-md text-on-surface-variant ml-xs">Target Date</label>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-md py-sm focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md" name="due_date" type="date"/>
+</div>
+<button class="bg-secondary text-on-secondary py-[10px] px-lg rounded-lg font-label-md hover:shadow-lg hover:-translate-y-px transition-all duration-200" type="submit">
+                Create Task
+</button>
+</form>
+</section>
+{% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for msg in messages %}
                 <p id="task-flash">{{ msg }}</p>
             {% endfor %}
         {% endif %}
     {% endwith %}
-<div class="task-tabs">
-    <input type="radio" id="mytasks" name="tabs" checked>
-    <input type="radio" id="allocated" name="tabs">
-     <div class="tab-buttons">
-        <label for="mytasks">My Tasks</label>
-        <label for="allocated">Allocated Tasks</label>
-    </div>
-
-    <div class="my-tasks">
-
-        <h3 id="mt-heading">My Tasks</h3>
-
-        <div class="pending-tasks">
-
-            <p>Pending</p>
-
-            {% if pending %}
-
-                {% for task in pending %}
-
-                    <p><strong>{{ task.title }}</strong></p>
-                    <p>Assigned By: {{ task.creator.name }}</p>
-                    <p>Status: {{ task.status }}</p>
-                    <p>Created: {{ task.created_date }}</p>
-                    <p>Due: {{ task.due_date }}</p> 
-
-                    <form action="{{ url_for('complete_task', task_id=task.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to mark this task as completed?')">
-                        <input type="submit" value="Mark Complete">
-                    </form>
-
-                    <hr>
-
-                {% endfor %}
-
-            {% else %}
-
-                <p>No Pending Tasks</p>
-
-            {% endif %}
-
-        </div>
-
-        <div class="completed-tasks">
-
-            <p>Completed</p>
-
-            {% if completed %}
-
-                {% for task in completed %}
-
-                    <p><strong>{{ task.title }}</strong></p>
-                    <p>Assigned By: {{ task.creator.name }}</p>
-                    <p>Status: {{ task.status }}</p>
-                    <p>Created: {{ task.created_date }}</p>
-                    <p>Due: {{ task.due_date }}</p>
-                    <p>Completed: {{ task.completed_date }}</p>
-                    <hr>
-                {% endfor %}
-
-            {% else %}
-
-                <p>No Completed Tasks</p>
-
-            {% endif %}
-
-        </div>
-
-    </div>
-
-    <div class="created-tasks">
-
-        <h3 id="mt-heading">Allocated Tasks</h3>
-        <div class="pending-tasks">
-
-            <p>Pending</p>
-
-            {% if created_pending %}
-
-                {% for task in created_pending %}
-
-                    <p><strong>{{ task.title }}</strong></p>
-                    <p>Assigned To: {{ task.assignee.name }}</p>
-                    <p>Status: {{ task.status }}</p>
-                    <p>Created: {{ task.created_date }}</p>
-                    <p>Due: {{ task.due_date }}</p> 
-                    <hr>
-
-                {% endfor %}
-
-            {% else %}
-
-                <p>No Pending Tasks</p>
-
-            {% endif %}
-
-        </div>
-        <div class="completed-tasks">
-
-            <p>Completed</p>
-
-            {% if created_completed %}
-
-                {% for task in created_completed %}
-
-                    <p><strong>{{ task.title }}</strong></p>
-                    <p>Assigned To: {{ task.assignee.name }}</p>
-                    <p>Status: {{ task.status }}</p>
-                    <p>Created: {{ task.created_date }}</p>
-                    <p>Due: {{ task.due_date }}</p>
-                    <p>Completed: {{ task.completed_date }}</p>
-                    <hr>
-                {% endfor %}
-
-            {% else %}
-
-                <p>No Completed Tasks</p>
-
-            {% endif %}
-
-        </div>
+<!-- Dashboard Content -->
+<div class="grid grid-cols-1 gap-xl">
+<!-- Section 1: My Tasks -->
+<section id="my-tasks-section">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-secondary" data-icon="person">person</span>
+<h2 class="text-headline-md font-headline-md text-on-surface">My Tasks</h2>
 </div>
-{% endblock %}
+<div class="space-y-xl">
+<!-- Pending Sub-division -->
+<div class="collapsible-section">
+<button class="flex items-center justify-between w-full border-b border-outline-variant pb-xs mb-md group toggle-button" data-target="my-pending-content">
+<h3 class="text-label-md font-bold text-on-surface-variant uppercase">Pending</h3>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-transform duration-300 chevron-icon">expand_less</span>
+</button>
+<div class="collapse-content space-y-xs" id="my-pending-content" style="max-height: 2000px;">
+{% if pending %}
+{% for task in pending %}
+<div class="group bg-surface-container-lowest border border-outline-variant hover:border-secondary rounded-lg p-md flex flex-wrap md:flex-nowrap items-center gap-lg transition-all cursor-pointer">
+<div class="flex-1 min-w-[200px]">
+<p class="text-body-lg font-bold text-on-surface group-hover:text-secondary transition-colors">{{ task.title }}</p>
+<p class="text-body-md text-on-surface-variant mt-1">Assigned by <strong>{{ task.creator.name }}</strong></p></div>
+<div class="hidden md:flex items-center gap-xl">
+<div class="flex flex-col items-end">
+<span class="text-[10px] uppercase font-bold text-on-surface-variant">Created</span>
+<span class="text-body-md">{{ task.created_date }}</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] uppercase font-bold text-on-surface-variant">Target</span>
+<span class="text-body-md font-bold">{{task.due_date}}</span>
+</div>
+<form action="{{ url_for('complete_task', task_id=task.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to mark this task as completed?')">
+<button class="px-md py-xs border border-secondary text-secondary rounded-lg font-label-md hover:bg-secondary hover:text-on-secondary transition-colors mr-md" type="submit">Complete Task</button>
+</form>
+<div class="px-md py-xs rounded-full status-chip-pending text-label-md">{{ task.status }}</div>
+</div>
+</div>
+{% endfor %}
+{% else %}
+<div class="flex flex-col items-center justify-center py-xl text-center">
+<p class="text-body-md text-on-surface-variant">No pending tasks for you.</p>
+</div>
+{% endif %}
+</div>
+</div>
+<!-- Completed Sub-division -->
+<div class="collapsible-section">
+<button class="flex items-center justify-between w-full border-b border-outline-variant pb-xs mb-md group toggle-button" data-target="my-completed-content">
+<h3 class="text-label-md font-bold text-on-surface-variant uppercase">Completed</h3>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-transform duration-300 chevron-icon rotate-180">expand_more</span>
+</button>
+<div class="collapse-content space-y-xs collapsed" id="my-completed-content">
+{% if completed %}
+{% for task in completed %}
+<div class="group bg-surface-container-low/50 border border-outline-variant/50 rounded-lg p-md flex flex-wrap md:flex-nowrap items-center gap-lg transition-all opacity-70 hover:opacity-100">
+<div class="flex-1 min-w-[200px]">
+<p class="text-body-lg font-bold text-on-surface">{{ task.title }}</p>
+<p class="text-body-md text-on-surface-variant mt-1">Assigned by <strong>{{ task.creator.name }}</strong></p></div>
+<div class="hidden md:flex items-center gap-xl">
+<div class="flex flex-col items-end">
+<span class="text-[10px] uppercase font-bold text-on-surface-variant">Created</span>
+<span class="text-body-md">{{ task.created_date }}</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] uppercase font-bold text-on-surface-variant">Target</span>
+<span class="text-body-md">{{ task.due_date }}</span>
+</div>
+<div class="flex flex-col items-end text-emerald-600">
+<span class="text-[10px] uppercase font-bold">Completed</span>
+<span class="text-body-md font-bold">{{ task.completed_date }}</span>
+</div>
+<div class="px-md py-xs rounded-full status-chip-completed text-label-md">Completed</div>
+</div>
+</div>
+{% endfor %}
+{% else %}
+<div class="flex flex-col items-center justify-center py-xl text-center">
+<p class="text-body-md text-on-surface-variant">No Completed Tasks.</p>
+</div>
+{% endif %}
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Allocated Tasks -->
+<section class="hidden" id="allocated-tasks-section">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-secondary" data-icon="assignment_ind">assignment_ind</span>
+<h2 class="text-headline-md font-headline-md text-on-surface">Allocated Tasks</h2>
+</div>
+<div class="space-y-xl">
+<!-- Pending Sub-division -->
+<div class="collapsible-section">
+<button class="flex items-center justify-between w-full border-b border-outline-variant pb-xs mb-md group toggle-button" data-target="allocated-pending-content">
+<h3 class="text-label-md font-bold text-on-surface-variant uppercase">In Progress</h3>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-transform duration-300 chevron-icon">expand_less</span>
+</button>
+<div class="collapse-content space-y-xs" id="allocated-pending-content" style="max-height: 2000px;">
+{% if created_pending %}
+{% for task in created_pending %}
+<div class="group bg-surface-container-lowest border border-outline-variant hover:border-secondary rounded-lg p-md flex flex-wrap md:flex-nowrap items-center gap-lg transition-all cursor-pointer">
+<div class="flex-1 min-w-[200px]">
+<div class="flex items-center gap-sm mb-1">
+<p class="text-body-lg font-bold text-on-surface">{{task.title}}</p>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-xs"><span class="text-body-md text-on-surface-variant">Assigned to <strong>{{task.assignee.name}}</strong></span></div>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-lg min-w-[300px] justify-end">
+<div class="flex flex-col items-end">
+<span class="text-[10px] uppercase font-bold text-on-surface-variant">Created</span>
+<span class="text-body-md">{{task.created_date}}</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] uppercase font-bold text-on-surface-variant">Target</span>
+<span class="text-body-md font-bold">{{task.due_date}}</span>
+</div>
+</div>
+</div>
+{% endfor %}
+{% else %}
+<div class="flex flex-col items-center justify-center py-xl text-center">
+<p class="text-body-md text-on-surface-variant">No pending tasks.</p>
+</div>
+{% endif %}
+</div>
+</div>
+<!-- Completed Sub-division -->
+<div class="collapsible-section">
+<button class="flex items-center justify-between w-full border-b border-outline-variant pb-xs mb-md group toggle-button" data-target="allocated-completed-content">
+<h3 class="text-label-md font-bold text-on-surface-variant uppercase">Completed</h3>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-transform duration-300 chevron-icon rotate-180">expand_more</span>
+</button>
+<div class="collapse-content space-y-xs collapsed" id="allocated-completed-content">
+{% if created_completed %}
+{% for task in created_completed %}
+<div class="group bg-surface-container-low/50 border border-outline-variant/50 rounded-lg p-md flex flex-wrap md:flex-nowrap items-center gap-lg transition-all opacity-70 hover:opacity-100">
+<div class="flex-1 min-w-[200px]">
+<p class="text-body-lg font-bold text-on-surface">{{ task.title }}</p>
+<p class="text-body-md text-on-surface-variant mt-1">Assigned to <strong>{{ task.assignee.name }}</strong></p></div>
+<div class="hidden md:flex items-center gap-xl">
+<div class="flex flex-col items-end">
+<span class="text-[10px] uppercase font-bold text-on-surface-variant">Created</span>
+<span class="text-body-md">{{ task.created_date }}</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] uppercase font-bold text-on-surface-variant">Target</span>
+<span class="text-body-md">{{ task.due_date }}</span>
+</div>
+<div class="flex flex-col items-end text-emerald-600">
+<span class="text-[10px] uppercase font-bold">Completed</span>
+<span class="text-body-md font-bold">{{ task.completed_date }}</span>
+</div>
+<div class="px-md py-xs rounded-full status-chip-completed text-label-md">Completed</div>
+</div>
+</div>
+{% endfor %}
+{% else %}
+<div class="flex flex-col items-center justify-center py-xl text-center">
+<p class="text-body-md text-on-surface-variant">No Completed Tasks.</p>
+</div>
+{% endif %}
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<footer class="bg-surface-container-low border-t border-outline-variant">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin py-xl w-full max-w-max-width mx-auto gap-md">
+<div class="font-headline-md text-headline-md text-on-surface font-bold">TaskFlow</div><div class="font-body-md text-body-md text-on-surface-variant">Contact at <a href="mailto:karmapatel4@gmail.com" style="text-decoration: none; color: inherit;">karmapatel4@gmail.com</a></div>
+<div class="font-label-md text-label-md text-on-surface-variant opacity-70">
+                © 2026 TaskFlow Made by Karma Patel.
+            </div>
+</div>
+</footer>
+<script>
+    // Collapsible Logic
+    document.querySelectorAll('.toggle-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const targetId = button.getAttribute('data-target');
+            const content = document.getElementById(targetId);
+            const icon = button.querySelector('.chevron-icon');
+            
+            const isCollapsed = content.classList.toggle('collapsed');
+            
+            if (isCollapsed) {
+                content.style.maxHeight = '0px';
+                icon.innerText = 'expand_more';
+                icon.classList.add('rotate-180');
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.innerText = 'expand_less';
+                icon.classList.remove('rotate-180');
+            }
+        });
+    });
+
+    // Navigation Logic
+    const navMyTasks = document.getElementById('navMyTasks');
+    const navAllocatedTasks = document.getElementById('navAllocatedTasks');
+    const myTasksSection = document.getElementById('my-tasks-section');
+    const allocatedTasksSection = document.getElementById('allocated-tasks-section');
+
+    function resetActiveNav() {
+        [navMyTasks, navAllocatedTasks].forEach(btn => {
+            btn.classList.remove('bg-secondary-container', 'text-on-secondary-container');
+            btn.classList.add('text-on-surface-variant', 'hover:bg-surface-container-high');
+        });
+    }
+
+    navMyTasks.addEventListener('click', () => {
+        resetActiveNav();
+        navMyTasks.classList.add('bg-secondary-container', 'text-on-secondary-container');
+        navMyTasks.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-high');
+        
+        myTasksSection.classList.remove('hidden');
+        allocatedTasksSection.classList.add('hidden');
+    });
+
+    navAllocatedTasks.addEventListener('click', () => {
+        resetActiveNav();
+        navAllocatedTasks.classList.add('bg-secondary-container', 'text-on-secondary-container');
+        navAllocatedTasks.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-high');
+        
+        myTasksSection.classList.add('hidden');
+        allocatedTasksSection.classList.remove('hidden');
+    });
+</script>
+</body></html>
