@@ -25,13 +25,24 @@ class User(db.Model):
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(850), nullable=False)
+    title = db.Column(db.String(850),nullable=False)
     assigned_to = db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
     assigned_by = db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
+    project_id = db.Column(db.Integer,db.ForeignKey('project.id'),nullable=True)
     status = db.Column(db.String(20),default="Pending")
     created_date = db.Column(db.Date,default=date.today)
     due_date = db.Column(db.Date,nullable=False)
     completed_date = db.Column(db.Date,nullable=True)
+
+class Project(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200),nullable=False)
+    assigned_to = db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
+    assigned_by = db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
+    # created_date = db.Column(db.Date,default=date.today)
+    tasks = db.relationship('Task',backref='project',lazy=True,cascade='all, delete')
+    assignee = db.relationship('User',foreign_keys=[assigned_to],backref='assigned_projects')
+    creator = db.relationship('User',foreign_keys=[assigned_by],backref='created_projects')
 
 # with app.app_context():
 #     db.create_all() #--> this increases cold start latency by 2-5 secs , thus create DB Manually
@@ -88,22 +99,26 @@ def dashboard():
 
         pending_tasks = Task.query.filter_by(
             assigned_to=currentUser.id,
-            status="Pending"
+            status="Pending",
+            project_id=None
         ).all()
 
         completed_tasks = Task.query.filter_by(
             assigned_to=currentUser.id,
-            status="Completed"
+            status="Completed",
+            project_id=None
         ).all()
 
         created_pending = Task.query.filter_by(
             assigned_by=currentUser.id,
-            status="Pending"
+            status="Pending",
+            project_id=None
         ).all()
 
         created_completed = Task.query.filter_by(
             assigned_by=currentUser.id,
-            status="Completed"
+            status="Completed",
+            project_id=None
         ).all()
 
         users = User.query.all()
@@ -185,6 +200,24 @@ def complete_task(task_id):
 
     return redirect(url_for('dashboard'))
 
+@app.route('/complete-task-project/<int:task_id>', methods=['POST'])
+def complete_task_project(task_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    task = Task.query.get_or_404(task_id)
+
+    if task.assigned_to != session["user_id"]:
+        flash("Unauthorized")
+        return redirect(url_for("projects"))
+
+    task.status = "Completed"
+    task.completed_date = date.today()
+
+    db.session.commit()
+
+    return redirect(url_for('projects'))
+
 # @app.route('/delete-task/<int:task_id>', methods=['POST'])
 # def delete_task(task_id):
 
@@ -202,6 +235,128 @@ def complete_task(task_id):
 
 #     flash("Task deleted successfully.")
 #     return redirect(url_for("dashboard"))
+
+
+@app.route('/projects', methods=['GET','POST'])
+def projects():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    try:
+        currentUser = User.query.get(session["user_id"])
+
+        users = User.query.all()
+        # active_projects = Project.query.filter_by(assigned_to=session["user_id"]).all()
+        my_active_projects = []
+        my_completed_projects = []
+        allocated_active_projects = []
+        allocated_completed_projects = []
+
+
+        for project in Project.query.filter_by(assigned_to=session['user_id']).all():
+
+            if any(task.status == "Pending" for task in project.tasks):
+                my_active_projects.append(project)
+
+            if any(task.status == "Completed" for task in project.tasks):
+                my_completed_projects.append(project)
+        
+        for project in Project.query.filter_by(assigned_by=session['user_id']).all():
+            if any(task.status == 'Pending' for task in project.tasks):
+                allocated_active_projects.append(project)
+
+            if any(task.status == 'Completed' for task in project.tasks):
+                allocated_completed_projects.append(project)
+        
+        return render_template(
+            "projects.html",
+            currentUser=currentUser,
+            users=users,
+            my_active_projects=my_active_projects,
+            my_completed_projects=my_completed_projects,
+            allocated_active_projects=allocated_active_projects,
+            allocated_completed_projects=allocated_completed_projects
+        )
+    except:
+        flash('Error loading Data')
+        return render_template('projects.html')
+
+@app.route('/add-project', methods=['GET','POST'])
+def add_project():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    project_name = request.form.get("project_name")
+    assigned_to_name = request.form.get("to")
+
+    if not project_name:
+        flash("Please enter project name")
+        return redirect(url_for("projects"))
+
+    assigned_user = User.query.filter_by(
+        name=assigned_to_name
+    ).first()
+
+    if not assigned_user:
+        flash("Please select a valid user")
+        return redirect(url_for("projects"))
+
+    # Get all tasks from modal
+    task_titles = request.form.getlist("task_title[]")
+    task_due_dates = request.form.getlist("task_due_date[]")
+
+    valid_tasks = [t.strip() for t in task_titles if t.strip()]
+
+    if not valid_tasks:
+        flash("Please add at least one task")
+        return redirect(url_for("projects"))
+
+    try:
+        print(request.form)
+        print(task_titles)
+        print(task_due_dates)
+        project = Project(
+            name=project_name,
+            assigned_to=assigned_user.id,
+            assigned_by=session["user_id"]
+        )
+
+        db.session.add(project)
+
+        # Generate project.id
+        db.session.flush()
+
+        for title, due_date_str in zip(task_titles, task_due_dates):
+
+            if not title.strip():
+                continue
+
+            due_date = datetime.strptime(
+                due_date_str,
+                "%Y-%m-%d"
+            ).date()
+
+            task = Task(
+                title=title,
+                assigned_to=assigned_user.id,
+                assigned_by=session["user_id"],
+                project_id=project.id,
+                due_date=due_date
+            )
+
+            db.session.add(task)
+
+        db.session.commit()
+
+        flash("Project created successfully")
+
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        flash("Error creating project")
+
+    return redirect(url_for("projects"))
 
 #Logout
 @app.route("/logout")

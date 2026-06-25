@@ -1,0 +1,769 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Projects | TaskFlow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "surface-variant": "#d3e4fe",
+                    "on-secondary": "#ffffff",
+                    "surface-dim": "#cbdbf5",
+                    "secondary-fixed": "#d8e2ff",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "surface-container-lowest": "#ffffff",
+                    "on-background": "#0b1c30",
+                    "inverse-primary": "#bec6e0",
+                    "on-primary-container": "#7c839b",
+                    "tertiary-fixed": "#6ffbbe",
+                    "on-secondary-fixed-variant": "#004395",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#f8f9ff",
+                    "outline-variant": "#c6c6cd",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#e5eeff",
+                    "surface": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "tertiary": "#000000",
+                    "on-tertiary-fixed": "#002113",
+                    "inverse-surface": "#213145",
+                    "outline": "#76777d",
+                    "primary": "#000000",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "primary-container": "#131b2e",
+                    "on-primary": "#ffffff",
+                    "surface-container-high": "#dce9ff",
+                    "on-tertiary-container": "#009668",
+                    "on-surface-variant": "#45464d",
+                    "surface-tint": "#565e74",
+                    "on-error": "#ffffff",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "on-surface": "#0b1c30",
+                    "background": "#f8f9ff",
+                    "secondary": "#0058be",
+                    "primary-fixed": "#dae2fd",
+                    "tertiary-container": "#002113",
+                    "on-secondary-fixed": "#001a42",
+                    "on-secondary-container": "#fefcff",
+                    "surface-container-low": "#eff4ff",
+                    "primary-fixed-dim": "#bec6e0",
+                    "secondary-container": "#2170e4",
+                    "inverse-on-surface": "#eaf1ff",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-primary-fixed": "#131b2e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "max-width": "1440px",
+                    "md": "16px",
+                    "margin": "32px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #F8FAFC;
+        color: #0b1c30;
+    }
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        vertical-align: middle;
+    }
+    .project-row:hover .view-tasks-btn {
+        opacity: 1;
+    }
+    .transition-height {
+        transition: max-height 0.3s ease-in-out;
+        overflow: hidden;
+    }
+    #task-flash {
+        width: fit-content;
+        margin: 15px auto;
+        padding: 10px 20px;
+        background-color: #E3F2FD;
+        color: #0D47A1;
+        border: 1px solid #0A3680;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 14px;
+    }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="bg-surface w-full h-16 border-b border-outline-variant transition-all sticky top-0 z-50">
+<div class="flex justify-between items-center px-margin max-w-max-width mx-auto h-full">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-primary">TaskFlow</span>
+<nav class="hidden md:flex items-center gap-lg h-full">
+<a class="font-body-md text-body-md h-full flex items-center transition-colors cursor-pointer text-secondary border-b-2 border-secondary pb-1" href="javascript:void(0)" id="navMyProjects">My Projects</a>
+<a class="font-body-md text-body-md transition-colors h-full flex items-center cursor-pointer text-on-surface-variant hover:text-secondary" href="javascript:void(0)" id="navAllocatedProjects">Allocated Projects</a>
+<a href="{{url_for('dashboard')}}"><button class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" id="navAllocatedTasks">Dashboard</button></a>
+
+</nav>
+</div>
+<div class="flex items-center gap-md">
+
+<button class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors cursor-pointer active:opacity-80"><a href="{{ url_for('logout') }}">Logout</a></button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow max-w-max-width mx-auto w-full px-margin py-xl">
+<!-- Quick Create Project Bar -->
+<section class="bg-white border border-outline-variant rounded-xl p-lg mb-xl shadow-sm">
+    <div class="flex flex-col md:flex-row gap-md items-end md:items-center">
+        <div class="flex-grow w-full">
+        <form id="project-form" action="{{ url_for('add_project') }}" method="POST">
+                <label class="block font-label-md text-label-md text-on-surface-variant mb-xs uppercase">Project
+                    Name</label>
+                <input
+                    class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all"
+                    placeholder="Enter project title" type="text" name="project_name">
+            <div class="w-full md:w-64" style="margin-top: 20px;">
+                <label class="block font-label-md text-label-md text-on-surface-variant mb-xs uppercase">Assign
+                    To</label>
+                <select
+                    class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all appearance-none cursor-pointer"
+                    name="to">
+                    <option>Select Assignee</option>
+                    {% for user in users %}
+                    {% if user.name != currentUser.name %}
+                    <option value="{{ user.name }}">
+                        {{ user.name }}
+                    </option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <button
+                class="bg-secondary text-on-secondary px-xl py-sm rounded-lg font-label-md text-label-md hover:bg-secondary/90 transition-all flex items-center gap-sm h-[42px] whitespace-nowrap"
+                type="button" onclick="openAddTaskModal()" style="margin-top: 20px;">
+                <span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">add</span>
+                Create Project
+            </button>
+            <!-- Add Task Model -->
+            <div class="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-md"
+                id="modal-overlay">
+                <div class="bg-surface-container-lowest w-full max-w-2xl rounded-xl shadow-[0px_20px_25px_-5px_rgba(15,23,42,0.1)] flex flex-col overflow-hidden transform transition-all duration-300 scale-95 opacity-0"
+                    id="task-modal">
+                    <!-- Modal Header -->
+                    <div class="px-xl py-lg flex justify-between items-center border-b border-slate-border">
+                        <h2 class="font-headline-lg text-headline-lg text-on-surface">Add Tasks</h2>
+                        <button class="text-outline hover:text-on-surface transition-colors" type="button"
+                            onclick="hideAddTaskModal()">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <!-- Modal Content (Scrollable Task List) -->
+                    <div class="p-xl space-y-md max-h-[512px] overflow-y-auto" id="task-rows-container">
+                        <!-- Initial Row -->
+                        <div
+                            class="task-row grid grid-cols-1 md:grid-cols-2 gap-md items-end p-md bg-surface-container-low/30 rounded-lg border border-transparent hover:border-slate-border transition-all group">
+                            <div class="space-y-xs">
+                                <label
+                                    class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Task
+                                    Name</label>
+                                <input
+                                    class="w-full h-11 px-md border-input-border border rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md"
+                                    name="task_title[]" placeholder="Enter Task Name" type="text" />
+                            </div>
+                            <div class="flex gap-sm items-end">
+                                <div class="flex-grow space-y-xs">
+                                    <label
+                                        class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Due
+                                        Date</label>
+                                    <input
+                                        class="w-full h-11 px-md border-input-border border rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md"
+                                        name="task_due_date[]" type="date" />
+                                </div>
+                                <button
+                                    class="remove-row h-11 w-11 flex items-center justify-center text-error opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error-container/20 rounded-lg"
+                                    type="button" onclick="removeTaskRow(this)">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Add More Button -->
+                    <div class="px-xl pb-xl">
+                        <button
+                            class="flex items-center gap-2 text-secondary font-headline-md hover:underline transition-all py-sm"
+                            type="button" id="add-more-btn">
+                            <span class="material-symbols-outlined">add_circle</span>
+                            Add More
+                        </button>
+                    </div>
+                    <!-- Modal Footer -->
+                    <div
+                        class="px-xl py-lg bg-surface-container-low border-t border-slate-border flex flex-col md:flex-row justify-end items-center gap-md">
+                        <button
+                            class="w-full md:w-auto px-lg py-md border border-slate-border text-on-surface font-headline-md rounded-lg hover:bg-surface-bright transition-all"
+                            type="button" onclick="hideAddTaskModal()">
+                            Cancel
+                        </button>
+                        <button
+                            class="w-full md:w-auto px-lg py-md bg-secondary text-on-secondary font-headline-md rounded-lg shadow-sm hover:opacity-90 active:scale-[0.98] transition-all"
+                            type="button" id="create-tasks-btn">
+                            Create Tasks
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- End Task Model -->
+            
+        </form>
+    </div>
+    </div>
+</section>
+{% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p id="task-flash">{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+<!-- Page Header -->
+<header class="mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-on-background">Project Management</h1>
+</header>
+<!-- My Projects Section -->
+<section class="mb-xl" id="my-projects-section">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-secondary">folder_shared</span>
+<h2 class="font-headline-md text-headline-md">My Projects</h2>
+</div>
+<!-- Active Sub-section -->
+<div class="mb-lg">
+<button class="flex items-center justify-between w-full p-md bg-surface-container-low rounded-lg hover:bg-surface-container transition-colors group" onclick="toggleSection('active-projects-list')">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined transform transition-transform duration-200" id="active-projects-list-icon">expand_more</span>
+<span class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Active Projects</span>
+</div>
+</button>
+<div class="mt-base space-y-base overflow-hidden transition-all duration-300" id="active-projects-list">
+    {% if my_active_projects %}
+<!-- Project Row 1 -->
+ {% for pr in my_active_projects %}
+    
+<div class="project-row bg-white border-b border-outline-variant p-md flex flex-col group">
+<div class="flex items-center justify-between w-full">
+<div class="flex items-center gap-lg flex-grow">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">{{pr.name}}</h3>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Assigned By: {{pr.creator.name}}</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="view-tasks-btn flex items-center gap-xs font-label-md text-label-md text-secondary hover:underline transition-all" onclick="toggleTasks('active-tasks-{{pr.id}}')">
+                                View Tasks<span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+
+    
+<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden hidden" id="active-tasks-{{pr.id}}">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Task Name</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Assigned by</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Created</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Due Date</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Status</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase text-right">Action</th>
+</tr>
+</thead>
+<tbody>
+
+    {% for task in pr.tasks %}
+        
+{% if task.status == "Pending" %}
+    <tr class="border-b border-outline-variant/50">
+<td class="p-sm font-body-md text-body-md">{{task.title}}</td>
+<td class="p-sm font-body-md text-body-md">{{task.creator.name}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.created_date}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.due_date}}</td>
+<td class="p-sm"><span class="bg-amber-200 text-amber-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">{{task.status}}</span></td>
+<td class="p-sm text-right">
+<form action="{{ url_for('complete_task_project', task_id=task.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to mark this task as completed?')">
+<button class="border border-secondary text-secondary px-md py-1 rounded-lg font-label-md text-[11px] hover:bg-secondary/10 transition-all">Complete Task</button>
+</form>
+</td>
+</tr>
+{% endif %}
+{% endfor %}
+
+</tbody>
+</table>
+</div>
+</div>
+ {% endfor %}
+
+<!-- Project Row 2 -->
+<!-- <div class="project-row bg-white border-b border-outline-variant p-md flex flex-col group">
+<div class="flex items-center justify-between w-full">
+<div class="flex items-center gap-lg flex-grow">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Infrastructure Overhaul v2</h3>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Deadline: Sep 28, 2024</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="view-tasks-btn flex items-center gap-xs font-label-md text-label-md text-secondary hover:underline transition-all" onclick="toggleTasks('tasks-2')">
+                                View Tasks<span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden" id="tasks-2">
+<div class="p-lg text-center text-on-surface-variant font-body-md italic">No sub-tasks defined for this project yet.</div>
+</div>
+</div>
+</div>
+</div> -->
+{%else%}
+<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden" >
+<div class="p-lg text-center text-on-surface-variant font-body-md italic">No Projects.</div>
+{% endif %}
+</div></div>
+<!-- Completed Sub-section -->
+ 
+ <!-- <div> -->
+<button class="flex items-center justify-between w-full p-md bg-surface-container-low rounded-lg hover:bg-surface-container transition-colors group" onclick="toggleSection('completed-projects-list')" style="margin-top: 10px;">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined transform transition-transform duration-200" id="completed-projects-list-icon" style="transform: rotate(0deg);">expand_more</span>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Completed Projects</span>
+</div>
+</button>
+<div class="mt-base space-y-base overflow-hidden transition-all duration-300" id="completed-projects-list">
+    {% if my_completed_projects %}
+<!-- Project Row 1 -->
+ {% for pr in my_completed_projects %}
+    
+<div class="project-row bg-white border-b border-outline-variant p-md flex flex-col group">
+<div class="flex items-center justify-between w-full">
+<div class="flex items-center gap-lg flex-grow">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">{{pr.name}}</h3>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Assigned By: {{pr.creator.name}}</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="view-tasks-btn flex items-center gap-xs font-label-md text-label-md text-secondary hover:underline transition-all" onclick="toggleTasks('completed-tasks-{{pr.id}}')">
+                                View Tasks<span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+
+    
+<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden hidden" id="completed-tasks-{{pr.id}}">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Task Name</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Assigned by</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Created</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Target Date</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Completed Date</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase text-right">Status</th>
+</tr>
+</thead>
+<tbody>
+
+    {% for task in pr.tasks %}
+        
+{% if task.status == "Completed" %}
+    <tr class="border-b border-outline-variant/50">
+<td class="p-sm font-body-md text-body-md">{{task.title}}</td>
+<td class="p-sm font-body-md text-body-md">{{task.creator.name}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.created_date}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.due_date}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.completed_date}}</td>
+<td class="p-sm text-right">
+<span class="bg-green-200 text-green-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">{{task.status}}</span>   
+</td>
+</tr>
+{% endif %}
+{% endfor %}
+
+</tbody>
+</table>
+</div>
+</div>
+ {% endfor %}
+{%else%}
+<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden" id="tasks-2">
+<div class="p-lg text-center text-on-surface-variant font-body-md italic">No Projects.</div>
+{% endif %}
+</div></div></div></section>
+<!--<div class="mt-base space-y-base overflow-hidden" id="completed-projects-list">Project Row 1 (Completed)
+<div class="project-row bg-white border-b border-outline-variant p-md flex flex-col group">
+    <div class="flex items-center justify-between w-full">
+        <div class="flex items-center gap-lg flex-grow">
+            <div>
+                <h3 class="font-headline-md text-headline-md text-on-surface">Quarterly Audit 2024</h3>
+                <div class="flex flex-wrap items-center gap-md mt-xs">
+                    <span class="font-body-md text-[12px] text-on-surface-variant">Deadline: Oct 05, 2024</span>
+                    <span class="bg-emerald-100 text-emerald-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">Completed</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-md">
+            <button class="view-tasks-btn flex items-center gap-xs font-label-md text-label-md text-secondary hover:underline transition-all" onclick="toggleTasks('tasks-completed-1')">
+                View Tasks<span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+            </button>
+        </div>
+    </div>
+    <div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden" id="tasks-completed-1"><table class="w-full text-left"><thead class="bg-surface-container-low border-b border-outline-variant"><tr><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Task Name</th><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Assignee</th><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Created</th><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Due Date</th><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Status</th><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase text-right">Action</th></tr></thead><tbody><tr class="border-b border-outline-variant/50"><td class="p-sm font-body-md text-body-md">Internal Controls Review</td><td class="p-sm font-body-md text-body-md">Michael Chen</td><td class="p-sm font-body-md text-[12px] text-on-surface-variant">Sep 15, 2024</td><td class="p-sm font-body-md text-[12px] text-on-surface-variant">Sep 30, 2024</td><td class="p-sm"><span class="bg-emerald-100 text-emerald-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">Completed</span></td><td class="p-sm text-right"><span class="text-[10px] text-on-surface-variant italic">Done Sep 28</span></td></tr><tr class="border-b border-outline-variant/50"><td class="p-sm font-body-md text-body-md">Financial Statement Prep</td><td class="p-sm font-body-md text-body-md">Emma Woods</td><td class="p-sm font-body-md text-[12px] text-on-surface-variant">Sep 10, 2024</td><td class="p-sm font-body-md text-[12px] text-on-surface-variant">Oct 02, 2024</td><td class="p-sm"><span class="bg-emerald-100 text-emerald-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">Completed</span></td><td class="p-sm text-right"><span class="text-[10px] text-on-surface-variant italic">Done Oct 01</span></td></tr></tbody></table></div>
+</div>
+Project Row 2 (Completed)
+<div class="project-row bg-white border-b border-outline-variant p-md flex flex-col group">
+    <div class="flex items-center justify-between w-full">
+        <div class="flex items-center gap-lg flex-grow">
+            <div>
+                <h3 class="font-headline-md text-headline-md text-on-surface">Security Infrastructure Patch</h3>
+                <div class="flex flex-wrap items-center gap-md mt-xs">
+                    <span class="font-body-md text-[12px] text-on-surface-variant">Deadline: Sep 20, 2024</span>
+                    <span class="bg-emerald-100 text-emerald-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">Completed</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-md">
+            <button class="view-tasks-btn flex items-center gap-xs font-label-md text-label-md text-secondary hover:underline transition-all" onclick="toggleTasks('tasks-completed-2')">
+                View Tasks<span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+            </button>
+        </div>
+    </div>
+    <div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden" id="tasks-completed-2"><table class="w-full text-left"><thead class="bg-surface-container-low border-b border-outline-variant"><tr><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Task Name</th><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Assignee</th><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Created</th><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Due Date</th><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Status</th><th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase text-right">Action</th></tr></thead><tbody><tr class="border-b border-outline-variant/50"><td class="p-sm font-body-md text-body-md">Firewall Rule Update</td><td class="p-sm font-body-md text-body-md">Alex Rivera</td><td class="p-sm font-body-md text-[12px] text-on-surface-variant">Sep 05, 2024</td><td class="p-sm font-body-md text-[12px] text-on-surface-variant">Sep 12, 2024</td><td class="p-sm"><span class="bg-emerald-100 text-emerald-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">Completed</span></td><td class="p-sm text-right"><span class="text-[10px] text-on-surface-variant italic">Done Sep 10</span></td></tr><tr class="border-b border-outline-variant/50"><td class="p-sm font-body-md text-body-md">SSL Certificate Renewal</td><td class="p-sm font-body-md text-body-md">Sarah Jenkins</td><td class="p-sm font-body-md text-[12px] text-on-surface-variant">Sep 08, 2024</td><td class="p-sm font-body-md text-[12px] text-on-surface-variant">Sep 15, 2024</td><td class="p-sm"><span class="bg-emerald-100 text-emerald-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">Completed</span></td><td class="p-sm text-right"><span class="text-[10px] text-on-surface-variant italic">Done Sep 14</span></td></tr></tbody></table></div>
+</div></div>
+</div>
+</section> -->
+<!-- Allocated Projects Section -->
+<section class="mb-xl hidden" id="allocated-projects-section">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">assignment_ind</span>
+<h2 class="font-headline-md text-headline-md">Allocated Projects</h2>
+</div>
+</div>
+<div class="space-y-base">
+<div class="mb-lg">
+<button class="flex items-center justify-between w-full p-md bg-surface-container-low rounded-lg mb-base hover:bg-surface-container transition-colors group" onclick="toggleSection('allocated-pending-list')">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined transform transition-transform duration-200" id="allocated-pending-list-icon">expand_more</span>
+<span class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Pending Projects</span>
+</div>
+</button>
+<div class="mt-base space-y-base overflow-hidden transition-all duration-300" id="allocated-pending-list">
+    {% if allocated_active_projects %}
+    {% for pr in allocated_active_projects %}
+        
+    
+<div class="project-row bg-white border border-outline-variant rounded-lg p-md flex flex-col hover:border-secondary transition-all group">
+<div class="flex items-center justify-between w-full">
+<div class="flex items-center gap-lg flex-grow">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">{{pr.name}}</h3>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Assigned To: {{pr.assignee.name}}</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<button class="view-tasks-btn flex items-center gap-xs font-label-md text-label-md text-secondary hover:underline transition-all" onclick="toggleTasks('allocated-active-tasks-{{pr.id}}')">
+                                    View Tasks
+                                    <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+<div class="hidden mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden hidden" id="allocated-active-tasks-{{pr.id}}">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Task Name</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Assigned To</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Created</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Due Date</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Completed Date</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase text-right">Status</th>
+</tr>
+</thead>
+<tbody>
+    {% for task in pr.tasks %}
+    {% if task.status == "Pending" %}
+<tr class="border-b border-outline-variant/50">
+<td class="p-sm font-body-md text-body-md">{{task.title}}</td>
+<td class="p-sm font-body-md text-body-md">{{task.assignee.name}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.created_date}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.due_date}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">--</td>
+<td class="p-sm text-right"><span class="bg-amber-100 text-amber-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">{{task.status}}</span></td>
+</tr>
+{% endif %}
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+    {% endfor %}
+    {%else%}
+<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden" >
+<div class="p-lg text-center text-on-surface-variant font-body-md italic">No Projects.</div>
+{% endif %}
+</div></div>
+
+<!-- Allocated Completed Sub-section -->
+<div>
+<button class="flex items-center justify-between w-full p-md bg-surface-container-low rounded-lg mb-base hover:bg-surface-container transition-colors group" onclick="toggleSection('allocated-completed-list')">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined transform transition-transform duration-200" id="allocated-completed-list-icon">expand_more</span>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Completed Projects</span>
+</div>
+</button>
+<div class="mt-base space-y-base overflow-hidden" id="allocated-completed-list">
+{% if allocated_completed_projects %}
+    {% for pr in allocated_completed_projects %}
+        
+    
+<div class="project-row bg-white border border-outline-variant rounded-lg p-md flex flex-col hover:border-secondary transition-all group">
+<div class="flex items-center justify-between w-full">
+<div class="flex items-center gap-lg flex-grow">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">{{pr.name}}</h3>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Assigned To: {{pr.assignee.name}}</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<button class="view-tasks-btn flex items-center gap-xs font-label-md text-label-md text-secondary hover:underline transition-all" onclick="toggleTasks('allocated-completed-tasks-{{pr.id}}')">
+                                    View Tasks
+                                    <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+<div class="hidden mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden hidden" id="allocated-completed-tasks-{{pr.id}}">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Task Name</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Assigned To</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Created</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Due Date</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase">Completed Date</th>
+<th class="p-sm font-label-md text-[11px] text-on-surface-variant uppercase text-right">Status</th>
+</tr>
+</thead>
+<tbody>
+    {% for task in pr.tasks %}
+    {% if task.status == "Completed" %}
+<tr class="border-b border-outline-variant/50">
+<td class="p-sm font-body-md text-body-md">{{task.title}}</td>
+<td class="p-sm font-body-md text-body-md">{{task.assignee.name}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.created_date}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.due_date}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.completed_date}}</td>
+<td class="p-sm text-right"><span class="bg-green-200 text-green-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">{{task.status}}</span></td>
+</tr>
+{% endif %}
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+    {% endfor %}
+    {%else%}
+<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden" >
+<div class="p-lg text-center text-on-surface-variant font-body-md italic">No Projects.</div>
+{% endif %}
+</div></div>
+</section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant mt-xl">
+<div class="max-w-max-width mx-auto px-margin py-8 flex flex-col md:flex-row justify-between items-center gap-lg">
+<div class="flex flex-col items-center md:items-start gap-xs">
+<span class="font-headline-md text-headline-md font-bold text-primary">TaskFlow</span>
+<span class="font-label-md text-label-md text-on-surface-variant">© 2026 TaskFlow Made by Karma Patel.</span>
+</div>
+<div class="flex flex-wrap justify-center gap-xl">
+ <a href="mailto:karmapatel4@gmail.com" style="text-decoration: none; color: inherit;">Contact Support</a>
+</div>
+</div>
+</footer>
+<script>
+    function toggleSection(id) {
+        const list = document.getElementById(id);
+        const icon = document.getElementById(id + '-icon');
+        
+        if (list.classList.contains('hidden')) {
+            list.classList.remove('hidden');
+            icon.style.transform = 'rotate(0deg)';
+        } else {
+            list.classList.add('hidden');
+            icon.style.transform = 'rotate(-90deg)';
+        }
+    }
+
+    function toggleTasks(id) {
+        const taskEl = document.getElementById(id);
+        if (taskEl.classList.contains('hidden')) {
+            taskEl.classList.remove('hidden');
+        } else {
+            taskEl.classList.add('hidden');
+        }
+    }
+
+    // Modal Logic
+    const overlay = document.getElementById('modal-overlay');
+    const modal = document.getElementById('task-modal');
+    const taskRowsContainer = document.getElementById('task-rows-container');
+    const addMoreBtn = document.getElementById('add-more-btn');
+
+    function openAddTaskModal() {
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+        // Reset container to one row if needed
+        setTimeout(() => {
+            modal.classList.remove('scale-95', 'opacity-0');
+            modal.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function hideAddTaskModal() {
+        modal.classList.add('scale-95', 'opacity-0');
+        modal.classList.remove('scale-100', 'opacity-100');
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+        }, 300);
+    }
+
+    function removeTaskRow(btn) {
+        const rows = document.querySelectorAll('.task-row');
+        if (rows.length > 1) {
+            btn.closest('.task-row').remove();
+        }
+    }
+
+    addMoreBtn.addEventListener('click', () => {
+        const rowTemplate = `
+            <div class="task-row grid grid-cols-1 md:grid-cols-2 gap-md items-end p-md bg-surface-container-low/30 rounded-lg border border-transparent hover:border-slate-border transition-all group opacity-0 translate-y-4">
+                <div class="space-y-xs">
+                    <label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Task Name</label>
+                    <input class="w-full h-11 px-md border-input-border border rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md" name="task_title[]" placeholder="Enter Task Name" type="text">
+                </div>
+                <div class="flex gap-sm items-end">
+                    <div class="flex-grow space-y-xs">
+                        <label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Due Date</label>
+                        <input class="w-full h-11 px-md border-input-border border rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md" name="task_due_date[]" type="date">
+                    </div>
+                    <button class="remove-row h-11 w-11 flex items-center justify-center text-error opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error-container/20 rounded-lg" type="button" onclick="removeTaskRow(this)">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+            </div>
+        `;
+        taskRowsContainer.insertAdjacentHTML('beforeend', rowTemplate);
+        const newRow = taskRowsContainer.lastElementChild;
+        setTimeout(() => {
+            newRow.classList.remove('opacity-0', 'translate-y-4');
+            taskRowsContainer.scrollTo({ top: taskRowsContainer.scrollHeight, behavior: 'smooth' });
+        }, 50);
+    });
+
+    document.getElementById('create-tasks-btn').addEventListener('click', () => {
+        // Mock creation
+        const formData = new FormData(document.getElementById('project-form'));
+
+        console.log("----- FORM DATA -----");
+
+        for (const pair of formData.entries()) {
+            console.log(pair[0], pair[1]);
+        }
+       document.getElementById('project-form').submit();
+    });
+
+    // Tab Switching Logic
+    const navMyProjects = document.getElementById('navMyProjects');
+    const navAllocatedProjects = document.getElementById('navAllocatedProjects');
+    const sectionMyProjects = document.getElementById('my-projects-section');
+    const sectionAllocatedProjects = document.getElementById('allocated-projects-section');
+
+    const activeClasses = ['text-secondary', 'border-b-2', 'border-secondary', 'pb-1'];
+    const inactiveClasses = ['text-on-surface-variant', 'hover:text-secondary'];
+
+    function showMyProjects() {
+        sectionMyProjects.classList.remove('hidden');
+        sectionAllocatedProjects.classList.add('hidden');
+        
+        navMyProjects.classList.add(...activeClasses);
+        navMyProjects.classList.remove(...inactiveClasses);
+        
+        navAllocatedProjects.classList.remove(...activeClasses);
+        navAllocatedProjects.classList.add(...inactiveClasses);
+    }
+
+    function showAllocatedProjects() {
+        sectionMyProjects.classList.add('hidden');
+        sectionAllocatedProjects.classList.remove('hidden');
+        
+        navAllocatedProjects.classList.add(...activeClasses);
+        navAllocatedProjects.classList.remove(...inactiveClasses);
+        
+        navMyProjects.classList.remove(...activeClasses);
+        navMyProjects.classList.add(...inactiveClasses);
+    }
+
+    navMyProjects.addEventListener('click', showMyProjects);
+    navAllocatedProjects.addEventListener('click', showAllocatedProjects);
+</script>
+
+
+</body></html>

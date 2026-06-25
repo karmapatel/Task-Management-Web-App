@@ -3,7 +3,7 @@
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>TaskFlow Analytics Dashboard</title>
+<title>Tasks | TaskFlow</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
@@ -140,13 +140,14 @@
 <div class="flex justify-between items-center w-full px-margin h-full max-w-max-width mx-auto">
 <div class="flex items-center gap-xl">
 <div class="flex items-center gap-sm">
-<img alt="Logo" class="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLvK2fvhGH9MrPg5Ch8M30QoB0yXBYZhz8CTc1O3eQyiMtJS1Bwptc7ub5drEvQqxph8IqayYk5J-XbcbEi6aFS-Jxm7bIRbcs0hvz67Qu0xXaAlcIsTLEohqBiLqCFThg2awaP5BsmXsriuMv6kfoKxgourDSSm9hxDPGnUS8d-i7f2_jdVev_4J8A8F_4zt_Z47X-szKPlN_f9VGTnPKhq9jmH0DqTUZrMIIqnYPla0zzXPe_Ps4aY1uU"/>
+<!-- <img alt="Logo" class="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLvK2fvhGH9MrPg5Ch8M30QoB0yXBYZhz8CTc1O3eQyiMtJS1Bwptc7ub5drEvQqxph8IqayYk5J-XbcbEi6aFS-Jxm7bIRbcs0hvz67Qu0xXaAlcIsTLEohqBiLqCFThg2awaP5BsmXsriuMv6kfoKxgourDSSm9hxDPGnUS8d-i7f2_jdVev_4J8A8F_4zt_Z47X-szKPlN_f9VGTnPKhq9jmH0DqTUZrMIIqnYPla0zzXPe_Ps4aY1uU"/> -->
 <span class="text-headline-md font-headline-md font-bold text-secondary">TaskFlow</span>
 </div>
 <!-- Top Navigation Links -->
 <nav class="hidden md:flex items-center gap-lg ml-xl">
 <button class="text-label-md font-bold px-md py-sm rounded-lg bg-secondary-container text-on-secondary-container transition-all" id="navMyTasks">My Tasks</button>
 <button class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" id="navAllocatedTasks">Allocated Tasks</button>
+<a href="{{url_for('projects')}}"><button class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" id="navAllocatedTasks">Projects</button></a>
 </nav>
 </div>
 <div class="flex items-center gap-md">
@@ -319,6 +320,9 @@
 <span class="text-[10px] uppercase font-bold text-on-surface-variant">Target</span>
 <span class="text-body-md font-bold">{{task.due_date}}</span>
 </div>
+<div class="flex flex-col items-end">
+<span class="px-md py-xs rounded-full status-chip-pending text-label-md">{{task.status}}</span>
+</div>
 </div>
 </div>
 {% endfor %}
@@ -355,7 +359,7 @@
 <span class="text-[10px] uppercase font-bold">Completed</span>
 <span class="text-body-md font-bold">{{ task.completed_date }}</span>
 </div>
-<div class="px-md py-xs rounded-full status-chip-completed text-label-md">Completed</div>
+<div class="px-md py-xs rounded-full status-chip-completed text-label-md">{{Completed}}</div>
 </div>
 </div>
 {% endfor %}
@@ -372,7 +376,7 @@
 </main>
 <footer class="bg-surface-container-low border-t border-outline-variant">
 <div class="flex flex-col md:flex-row justify-between items-center px-margin py-xl w-full max-w-max-width mx-auto gap-md">
-<div class="font-headline-md text-headline-md text-on-surface font-bold">TaskFlow</div><div class="font-body-md text-body-md text-on-surface-variant">Contact at <a href="mailto:karmapatel4@gmail.com" style="text-decoration: none; color: inherit;">karmapatel4@gmail.com</a></div>
+<div class="font-headline-md text-headline-md text-on-surface font-bold">TaskFlow</div><div class="font-body-md text-body-md text-on-surface-variant"><a href="mailto:karmapatel4@gmail.com" style="text-decoration: none; color: inherit;">Contact Support</a></div>
 <div class="font-label-md text-label-md text-on-surface-variant opacity-70">
                 © 2026 TaskFlow Made by Karma Patel.
             </div>
