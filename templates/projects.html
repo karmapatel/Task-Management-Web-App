@@ -130,15 +130,29 @@
 </head>
 <body class="flex flex-col min-h-screen">
 <!-- Top Navigation Bar -->
-<header class="bg-surface w-full h-16 border-b border-outline-variant transition-all sticky top-0 z-50">
-<div class="flex justify-between items-center px-margin max-w-max-width mx-auto h-full">
+<header class="bg-surface w-full min-h-16 border-b border-outline-variant transition-all sticky top-0 z-50">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin max-w-max-width mx-auto py-2">
 <div class="flex items-center gap-xl">
 <span class="font-headline-md text-headline-md font-bold text-primary">TaskFlow</span>
-<nav class="hidden md:flex items-center gap-lg h-full">
-<a class="font-body-md text-body-md h-full flex items-center transition-colors cursor-pointer text-secondary border-b-2 border-secondary pb-1" href="javascript:void(0)" id="navMyProjects">My Projects</a>
-<a class="font-body-md text-body-md transition-colors h-full flex items-center cursor-pointer text-on-surface-variant hover:text-secondary" href="javascript:void(0)" id="navAllocatedProjects">Allocated Projects</a>
-<a href="{{url_for('dashboard')}}"><button class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" id="navAllocatedTasks">Dashboard</button></a>
+<nav class="flex flex-wrap items-center gap-2 mt-2 md:mt-0">
+    <a class="font-body-md text-body-md transition-colors cursor-pointer text-secondary border-b-2 border-secondary pb-1"
+       href="javascript:void(0)"
+       id="navMyProjects">
+        My Projects
+    </a>
 
+    <a class="font-body-md text-body-md transition-colors cursor-pointer text-on-surface-variant hover:text-secondary"
+       href="javascript:void(0)"
+       id="navAllocatedProjects">
+        Allocated Projects
+    </a>
+
+    <a href="{{url_for('dashboard')}}">
+        <button class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
+                id="navAllocatedTasks">
+            Dashboard
+        </button>
+    </a>
 </nav>
 </div>
 <div class="flex items-center gap-md">
@@ -184,7 +198,7 @@
             <!-- Add Task Model -->
             <div class="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-md"
                 id="modal-overlay">
-                <div class="bg-surface-container-lowest w-full max-w-2xl rounded-xl shadow-[0px_20px_25px_-5px_rgba(15,23,42,0.1)] flex flex-col overflow-hidden transform transition-all duration-300 scale-95 opacity-0"
+                <div class="bg-surface-container-lowest w-full max-w-2xl max-h-[90vh] rounded-xl shadow-[0px_20px_25px_-5px_rgba(15,23,42,0.1)] flex flex-col overflow-hidden"
                     id="task-modal">
                     <!-- Modal Header -->
                     <div class="px-xl py-lg flex justify-between items-center border-b border-slate-border">
@@ -217,7 +231,7 @@
                                         name="task_due_date[]" type="date" />
                                 </div>
                                 <button
-                                    class="remove-row h-11 w-11 flex items-center justify-center text-error opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error-container/20 rounded-lg"
+                                    class="remove-row h-11 w-11 flex items-center justify-center text-error opacity-100 transition-opacity hover:bg-error-container/20 rounded-lg"
                                     type="button" onclick="removeTaskRow(this)">
                                     <span class="material-symbols-outlined">delete</span>
                                 </button>
@@ -303,7 +317,7 @@
 </div>
 
     
-<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden hidden" id="active-tasks-{{pr.id}}">
+<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-x-auto hidden" id="active-tasks-{{pr.id}}">
 <table class="w-full text-left">
 <thead class="bg-surface-container-low border-b border-outline-variant">
 <tr>
@@ -401,7 +415,7 @@
 </div>
 
     
-<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden hidden" id="completed-tasks-{{pr.id}}">
+<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-x-auto hidden" id="completed-tasks-{{pr.id}}">
 <table class="w-full text-left">
 <thead class="bg-surface-container-low border-b border-outline-variant">
 <tr>
@@ -521,7 +535,7 @@ Project Row 2 (Completed)
 </button>
 </div>
 </div>
-<div class="hidden mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden hidden" id="allocated-active-tasks-{{pr.id}}">
+<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-x-auto hidden" id="allocated-active-tasks-{{pr.id}}">
 <table class="w-full text-left">
 <thead class="bg-surface-container-low border-b border-outline-variant">
 <tr>
@@ -587,7 +601,7 @@ Project Row 2 (Completed)
 </button>
 </div>
 </div>
-<div class="hidden mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden hidden" id="allocated-completed-tasks-{{pr.id}}">
+<div class="mt-md bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-x-auto hidden" id="allocated-completed-tasks-{{pr.id}}">
 <table class="w-full text-left">
 <thead class="bg-surface-container-low border-b border-outline-variant">
 <tr>
@@ -704,7 +718,7 @@ Project Row 2 (Completed)
                         <label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Due Date</label>
                         <input class="w-full h-11 px-md border-input-border border rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md" name="task_due_date[]" type="date">
                     </div>
-                    <button class="remove-row h-11 w-11 flex items-center justify-center text-error opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error-container/20 rounded-lg" type="button" onclick="removeTaskRow(this)">
+                    <button class="remove-row h-11 w-11 flex items-center justify-center text-error opacity-100 transition-opacity hover:bg-error-container/20 rounded-lg" type="button" onclick="removeTaskRow(this)">
                         <span class="material-symbols-outlined">delete</span>
                     </button>
                 </div>

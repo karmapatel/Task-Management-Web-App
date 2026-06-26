@@ -136,18 +136,34 @@
 </head>
 <body class="bg-background text-on-surface font-body-md antialiased">
 <!-- TopNavBar Component -->
-<header class="bg-surface-container-lowest border-b border-outline-variant fixed top-0 left-0 w-full z-50 h-16">
-<div class="flex justify-between items-center w-full px-margin h-full max-w-max-width mx-auto">
+<header class="bg-surface-container-lowest border-b border-outline-variant fixed top-0 left-0 w-full z-50 min-h-16">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-margin py-2 max-w-max-width mx-auto">
 <div class="flex items-center gap-xl">
 <div class="flex items-center gap-sm">
 <!-- <img alt="Logo" class="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLvK2fvhGH9MrPg5Ch8M30QoB0yXBYZhz8CTc1O3eQyiMtJS1Bwptc7ub5drEvQqxph8IqayYk5J-XbcbEi6aFS-Jxm7bIRbcs0hvz67Qu0xXaAlcIsTLEohqBiLqCFThg2awaP5BsmXsriuMv6kfoKxgourDSSm9hxDPGnUS8d-i7f2_jdVev_4J8A8F_4zt_Z47X-szKPlN_f9VGTnPKhq9jmH0DqTUZrMIIqnYPla0zzXPe_Ps4aY1uU"/> -->
 <span class="text-headline-md font-headline-md font-bold text-secondary">TaskFlow</span>
 </div>
 <!-- Top Navigation Links -->
-<nav class="hidden md:flex items-center gap-lg ml-xl">
-<button class="text-label-md font-bold px-md py-sm rounded-lg bg-secondary-container text-on-secondary-container transition-all" id="navMyTasks">My Tasks</button>
-<button class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" id="navAllocatedTasks">Allocated Tasks</button>
-<a href="{{url_for('projects')}}"><button class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" id="navAllocatedTasks">Projects</button></a>
+<nav class="flex flex-wrap items-center gap-2 mt-2 md:mt-0 md:ml-xl">
+    <button
+        class="text-label-md font-bold px-md py-sm rounded-lg bg-secondary-container text-on-secondary-container transition-all"
+        id="navMyTasks">
+        My Tasks
+    </button>
+
+    <button
+        class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
+        id="navAllocatedTasks">
+        Allocated Tasks
+    </button>
+
+    <a href="{{ url_for('projects') }}">
+        <button
+            class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
+            id="navProjects">
+            Projects
+        </button>
+    </a>
 </nav>
 </div>
 <div class="flex items-center gap-md">
@@ -156,7 +172,7 @@
 </div>
 </header>
 <!-- Main Content Area - Full Width -->
-<main class="pt-24 pb-margin px-margin max-w-max-width mx-auto min-h-screen" id="mainContent">
+<main class="pt-40 md:pt-24 pb-margin px-margin max-w-max-width mx-auto min-h-screen" >
 <!-- Welcome Section -->
 <section class="mb-xl">
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
