@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, session, redirect, url_for,flash
+from flask import Flask, render_template, request, session, redirect, url_for,flash, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from datetime import date,datetime
 import os
+import openpyxl
+from openpyxl.styles import Font, Alignment, PatternFill
+from io import BytesIO
 
 app = Flask(__name__)
 
@@ -50,6 +53,8 @@ class Project(db.Model):
 #Login
 @app.route('/', methods=['GET','POST'])
 def login():
+    if "user_id" in session:
+        return redirect(url_for('dashboard'))
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -86,6 +91,106 @@ def register():
             flash('Please Check information or try again later.')
             return render_template('register.html')
     return render_template('register.html')
+
+#Export Data
+@app.route('/export-data')
+def export_data():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+ 
+    user_id = session["user_id"]
+    wb = openpyxl.Workbook()
+ 
+    # --- Sheet 1: Projects ---
+    ws_p = wb.active
+    ws_p.title = "Projects"
+    ws_p.append(["Project Name", "Assigned By", "Assigned To", "Total Tasks", "Pending", "Completed", "Created Date", "Due Date", "Completed Date"])
+    for cell in ws_p[1]:
+        cell.font = Font(bold=True)
+ 
+    # Styles for project summary rows vs nested task rows
+    summary_fill = PatternFill(start_color="DDEBF7", end_color="DDEBF7", fill_type="solid")
+    summary_font = Font(bold=True)
+    task_font = Font(italic=True, color="555555")
+    indent_align = Alignment(indent=2)
+ 
+    # Projects where I'm involved either way (assigned to me OR created by me)
+    my_projects = Project.query.filter(
+        (Project.assigned_to == user_id) | (Project.assigned_by == user_id)
+    ).all()
+ 
+    for p in my_projects:
+        pending = sum(1 for t in p.tasks if t.status == "Pending")
+        completed = sum(1 for t in p.tasks if t.status == "Completed")
+ 
+        # --- Project summary row (bold, shaded) ---
+        ws_p.append([
+            p.name,
+            p.creator.name,    # Assigned By
+            p.assignee.name,   # Assigned To
+            len(p.tasks),
+            pending,
+            completed,
+            "", "", ""
+        ])
+        summary_row = ws_p.max_row
+        for cell in ws_p[summary_row]:
+            cell.font = summary_font
+            cell.fill = summary_fill
+ 
+        # --- Nested task rows (indented, italic) ---
+        for t in p.tasks:
+            ws_p.append([
+                f"{t.title}",
+                "", "",
+                "",                                      # Total Tasks (blank for task rows)
+                "Pending" if t.status == "Pending" else "",      # Pending column
+                "Completed" if t.status == "Completed" else "",  # Completed column
+                t.created_date.strftime("%Y-%m-%d") if t.created_date else "",
+                t.due_date.strftime("%Y-%m-%d") if t.due_date else "",
+                t.completed_date.strftime("%Y-%m-%d") if t.completed_date else ""
+            ])
+            task_row = ws_p.max_row
+            ws_p.cell(row=task_row, column=1).font = task_font
+            ws_p.cell(row=task_row, column=1).alignment = indent_align
+            for col in range(2, 10):
+                ws_p.cell(row=task_row, column=col).font = task_font
+ 
+    # Widen first column so indentation + task titles are readable
+    ws_p.column_dimensions['A'].width = 35
+ 
+    # --- Sheet 2: Tasks ---
+    ws_t = wb.create_sheet("Tasks")
+    ws_t.append(["Title", "Project", "Assigned By", "Assigned To", "Status", "Created", "Due", "Completed"])
+    for cell in ws_t[1]:
+        cell.font = Font(bold=True)
+ 
+    my_tasks = Task.query.filter(
+        (Task.assigned_to == user_id) | (Task.assigned_by == user_id)
+    ).all()
+ 
+    for t in my_tasks:
+        ws_t.append([
+            t.title,
+            t.project.name if t.project else "-",
+            t.creator.name,    # Assigned By
+            t.assignee.name,   # Assigned To
+            t.status,
+            t.created_date.strftime("%Y-%m-%d") if t.created_date else "",
+            t.due_date.strftime("%Y-%m-%d") if t.due_date else "",
+            t.completed_date.strftime("%Y-%m-%d") if t.completed_date else ""
+        ])
+ 
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+ 
+    return Response(
+        output.getvalue(),
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=my_tasks_export.xlsx"}
+    )
+ 
 
 #Dashboard
 @app.route("/dashboard")
@@ -134,7 +239,15 @@ def dashboard():
         )
     except:
         flash('Error loading Data')
-        return render_template('dashboard.html')
+        return render_template(
+        'dashboard.html',
+        currentUser=None,
+        users=[],
+        pending=[],
+        completed=[],
+        created_pending=[],
+        created_completed=[]
+    )
 
 
 @app.route('/add_task', methods=['POST'])
@@ -279,7 +392,15 @@ def projects():
         )
     except:
         flash('Error loading Data')
-        return render_template('projects.html')
+        return render_template(
+            "projects.html",
+            currentUser=None,
+            users=[],
+            my_active_projects=[],
+            my_completed_projects=[],
+            allocated_active_projects=[],
+            allocated_completed_projects=[]
+        )
 
 @app.route('/add-project', methods=['GET','POST'])
 def add_project():
@@ -313,9 +434,6 @@ def add_project():
         return redirect(url_for("projects"))
 
     try:
-        print(request.form)
-        print(task_titles)
-        print(task_due_dates)
         project = Project(
             name=project_name,
             assigned_to=assigned_user.id,

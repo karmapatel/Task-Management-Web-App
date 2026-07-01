@@ -10,6 +10,7 @@
 - Create new tasks/projects
 - View pending and completed tasks/projects
 - Update task status (Pending -> Completed)
+- Export your Data in .xlsx format 
 - PostgreSQL database integration
 - Jinja2 templating for dynamic UI
 

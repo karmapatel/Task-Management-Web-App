@@ -132,6 +132,11 @@
     text-align: center;
     font-size: 14px;
 }
+@media (max-width: 768px) {
+    .task-card {
+        overflow-x: auto;
+    }
+}
     </style>
 </head>
 <body class="bg-background text-on-surface font-body-md antialiased">
@@ -236,23 +241,38 @@
 <div class="collapse-content space-y-xs" id="my-pending-content" style="max-height: 2000px;">
 {% if pending %}
 {% for task in pending %}
-<div class="group bg-surface-container-lowest border border-outline-variant hover:border-secondary rounded-lg p-md flex flex-wrap md:flex-nowrap items-center gap-lg transition-all cursor-pointer">
+<div class="task-card group bg-surface-container-lowest border border-outline-variant hover:border-secondary rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all cursor-pointer">
 <div class="flex-1 min-w-[200px]">
 <p class="text-body-lg font-bold text-on-surface group-hover:text-secondary transition-colors">{{ task.title }}</p>
 <p class="text-body-md text-on-surface-variant mt-1">Assigned by <strong>{{ task.creator.name }}</strong></p></div>
-<div class="hidden md:flex items-center gap-xl">
-<div class="flex flex-col items-end">
-<span class="text-[10px] uppercase font-bold text-on-surface-variant">Created</span>
-<span class="text-body-md">{{ task.created_date }}</span>
+<div class="flex flex-col sm:flex-row w-full md:w-auto gap-2 md:gap-xl mt-3 md:mt-0">
+<div class="flex justify-between sm:flex-col sm:items-end">
+    <span class="text-[10px] uppercase font-bold text-on-surface-variant">Created</span>
+    <span class="text-body-md">{{ task.created_date }}</span>
 </div>
-<div class="flex flex-col items-end">
-<span class="text-[10px] uppercase font-bold text-on-surface-variant">Target</span>
-<span class="text-body-md font-bold">{{task.due_date}}</span>
+
+<div class="flex justify-between sm:flex-col sm:items-end">
+    <span class="text-[10px] uppercase font-bold text-on-surface-variant">Target</span>
+    <span class="text-body-md font-bold">{{ task.due_date }}</span>
 </div>
-<form action="{{ url_for('complete_task', task_id=task.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to mark this task as completed?')">
-<button class="px-md py-xs border border-secondary text-secondary rounded-lg font-label-md hover:bg-secondary hover:text-on-secondary transition-colors mr-md" type="submit">Complete Task</button>
+
+<form
+    action="{{ url_for('complete_task', task_id=task.id) }}"
+    method="POST"
+    onsubmit="return confirm('Are you sure you want to mark this task as completed?')"
+    class="w-full sm:w-auto"
+>
+    <button
+        class="w-full sm:w-auto px-md py-xs border border-secondary text-secondary rounded-lg font-label-md hover:bg-secondary hover:text-on-secondary transition-colors"
+        type="submit"
+    >
+        Complete Task
+    </button>
 </form>
-<div class="px-md py-xs rounded-full status-chip-pending text-label-md">{{ task.status }}</div>
+
+<div class="px-md py-xs rounded-full status-chip-pending text-label-md text-center">
+    {{ task.status }}
+</div>
 </div>
 </div>
 {% endfor %}
@@ -272,11 +292,11 @@
 <div class="collapse-content space-y-xs collapsed" id="my-completed-content">
 {% if completed %}
 {% for task in completed %}
-<div class="group bg-surface-container-low/50 border border-outline-variant/50 rounded-lg p-md flex flex-wrap md:flex-nowrap items-center gap-lg transition-all opacity-70 hover:opacity-100">
+<div class="task-card bg-surface-container-low/50 border border-outline-variant/50 rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all opacity-70 hover:opacity-100">
 <div class="flex-1 min-w-[200px]">
 <p class="text-body-lg font-bold text-on-surface">{{ task.title }}</p>
 <p class="text-body-md text-on-surface-variant mt-1">Assigned by <strong>{{ task.creator.name }}</strong></p></div>
-<div class="hidden md:flex items-center gap-xl">
+<div class="flex flex-col sm:flex-row w-full md:w-auto gap-2 md:gap-xl mt-3 md:mt-0">
 <div class="flex flex-col items-end">
 <span class="text-[10px] uppercase font-bold text-on-surface-variant">Created</span>
 <span class="text-body-md">{{ task.created_date }}</span>
@@ -289,7 +309,7 @@
 <span class="text-[10px] uppercase font-bold">Completed</span>
 <span class="text-body-md font-bold">{{ task.completed_date }}</span>
 </div>
-<div class="px-md py-xs rounded-full status-chip-completed text-label-md">Completed</div>
+<div class="px-md py-xs rounded-full status-chip-completed text-label-md text-center">Completed</div>
 </div>
 </div>
 {% endfor %}
@@ -318,7 +338,7 @@
 <div class="collapse-content space-y-xs" id="allocated-pending-content" style="max-height: 2000px;">
 {% if created_pending %}
 {% for task in created_pending %}
-<div class="group bg-surface-container-lowest border border-outline-variant hover:border-secondary rounded-lg p-md flex flex-wrap md:flex-nowrap items-center gap-lg transition-all cursor-pointer">
+<div class="task-card bg-surface-container-lowest border border-outline-variant hover:border-secondary rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all cursor-pointer">
 <div class="flex-1 min-w-[200px]">
 <div class="flex items-center gap-sm mb-1">
 <p class="text-body-lg font-bold text-on-surface">{{task.title}}</p>
@@ -327,7 +347,7 @@
 <div class="flex items-center gap-xs"><span class="text-body-md text-on-surface-variant">Assigned to <strong>{{task.assignee.name}}</strong></span></div>
 </div>
 </div>
-<div class="hidden md:flex items-center gap-lg min-w-[300px] justify-end">
+<div class="flex flex-col sm:flex-row w-full md:w-auto gap-2 md:gap-lg mt-3 md:mt-0">
 <div class="flex flex-col items-end">
 <span class="text-[10px] uppercase font-bold text-on-surface-variant">Created</span>
 <span class="text-body-md">{{task.created_date}}</span>
@@ -358,11 +378,11 @@
 <div class="collapse-content space-y-xs collapsed" id="allocated-completed-content">
 {% if created_completed %}
 {% for task in created_completed %}
-<div class="group bg-surface-container-low/50 border border-outline-variant/50 rounded-lg p-md flex flex-wrap md:flex-nowrap items-center gap-lg transition-all opacity-70 hover:opacity-100">
+<div class="task-card bg-surface-container-low/50 border border-outline-variant/50 rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all opacity-70 hover:opacity-100">
 <div class="flex-1 min-w-[200px]">
 <p class="text-body-lg font-bold text-on-surface">{{ task.title }}</p>
 <p class="text-body-md text-on-surface-variant mt-1">Assigned to <strong>{{ task.assignee.name }}</strong></p></div>
-<div class="hidden md:flex items-center gap-xl">
+<div class="flex flex-col sm:flex-row w-full md:w-auto gap-2 md:gap-xl mt-3 md:mt-0">
 <div class="flex flex-col items-end">
 <span class="text-[10px] uppercase font-bold text-on-surface-variant">Created</span>
 <span class="text-body-md">{{ task.created_date }}</span>
@@ -375,7 +395,7 @@
 <span class="text-[10px] uppercase font-bold">Completed</span>
 <span class="text-body-md font-bold">{{ task.completed_date }}</span>
 </div>
-<div class="px-md py-xs rounded-full status-chip-completed text-label-md">{{Completed}}</div>
+<div class="px-md py-xs rounded-full status-chip-completed text-label-md text-center">Completed</div>
 </div>
 </div>
 {% endfor %}
@@ -393,6 +413,7 @@
 <footer class="bg-surface-container-low border-t border-outline-variant">
 <div class="flex flex-col md:flex-row justify-between items-center px-margin py-xl w-full max-w-max-width mx-auto gap-md">
 <div class="font-headline-md text-headline-md text-on-surface font-bold">TaskFlow</div><div class="font-body-md text-body-md text-on-surface-variant"><a href="mailto:karmapatel4@gmail.com" style="text-decoration: none; color: inherit;">Contact Support</a></div>
+<div class="font-body-md text-body-md text-on-surface-variant"><a href="{{ url_for('export_data') }}" style="text-decoration: none; color: inherit;">Export Data</a></div>
 <div class="font-label-md text-label-md text-on-surface-variant opacity-70">
                 © 2026 TaskFlow Made by Karma Patel.
             </div>
