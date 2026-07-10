@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for,flash, Response
+from flask import Flask, render_template, request, session, redirect, url_for,flash, Response, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from datetime import date,datetime
@@ -34,7 +34,7 @@ class Task(db.Model):
     project_id = db.Column(db.Integer,db.ForeignKey('project.id'),nullable=True)
     status = db.Column(db.String(20),default="Pending")
     created_date = db.Column(db.Date,default=date.today)
-    due_date = db.Column(db.Date,nullable=False)
+    due_date = db.Column(db.Date,nullable=True)
     completed_date = db.Column(db.Date,nullable=True)
 
 class Project(db.Model):
@@ -42,7 +42,9 @@ class Project(db.Model):
     name = db.Column(db.String(200),nullable=False)
     assigned_to = db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
     assigned_by = db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
-    # created_date = db.Column(db.Date,default=date.today)
+    price_validity = db.Column(db.Date,nullable=True)
+    tentative_dispatch_date = db.Column(db.Date,nullable=False)
+    sys_type = db.Column(db.String(200),nullable=False)
     tasks = db.relationship('Task',backref='project',lazy=True,cascade='all, delete')
     assignee = db.relationship('User',foreign_keys=[assigned_to],backref='assigned_projects')
     creator = db.relationship('User',foreign_keys=[assigned_by],backref='created_projects')
@@ -104,7 +106,7 @@ def export_data():
     # --- Sheet 1: Projects ---
     ws_p = wb.active
     ws_p.title = "Projects"
-    ws_p.append(["Project Name", "Assigned By", "Assigned To", "Total Tasks", "Pending", "Completed", "Created Date", "Due Date", "Completed Date"])
+    ws_p.append(["Sr No.","Project Name", "Assigned By", "Assigned To", "Type Of System", "Price Validity", "Tentative Dispatch Date", "Total Tasks", "Pending", "Completed", "Created Date", "Due Date", "Completed Date"])
     for cell in ws_p[1]:
         cell.font = Font(bold=True)
  
@@ -118,16 +120,21 @@ def export_data():
     my_projects = Project.query.filter(
         (Project.assigned_to == user_id) | (Project.assigned_by == user_id)
     ).all()
- 
+    sr_no = 0
     for p in my_projects:
+        sr_no += 1
         pending = sum(1 for t in p.tasks if t.status == "Pending")
         completed = sum(1 for t in p.tasks if t.status == "Completed")
  
         # --- Project summary row (bold, shaded) ---
         ws_p.append([
+            sr_no,
             p.name,
             p.creator.name,    # Assigned By
             p.assignee.name,   # Assigned To
+            p.sys_type,
+            p.price_validity,
+            p.tentative_dispatch_date,
             len(p.tasks),
             pending,
             completed,
@@ -141,8 +148,12 @@ def export_data():
         # --- Nested task rows (indented, italic) ---
         for t in p.tasks:
             ws_p.append([
+                "",
                 f"{t.title}",
+                "",
                 "", "",
+                "",
+                "",
                 "",                                      # Total Tasks (blank for task rows)
                 "Pending" if t.status == "Pending" else "",      # Pending column
                 "Completed" if t.status == "Completed" else "",  # Completed column
@@ -157,7 +168,7 @@ def export_data():
                 ws_p.cell(row=task_row, column=col).font = task_font
  
     # Widen first column so indentation + task titles are readable
-    ws_p.column_dimensions['A'].width = 35
+    ws_p.column_dimensions['B'].width = 35
  
     # --- Sheet 2: Tasks ---
     ws_t = wb.create_sheet("Tasks")
@@ -228,6 +239,8 @@ def dashboard():
 
         users = User.query.all()
 
+        admin = is_admin()
+
         return render_template(
             "dashboard.html",
             currentUser=currentUser,
@@ -235,7 +248,8 @@ def dashboard():
             pending=pending_tasks,
             completed=completed_tasks,
             created_pending=created_pending,
-            created_completed=created_completed
+            created_completed=created_completed,
+            admin=admin
         )
     except:
         flash('Error loading Data')
@@ -381,6 +395,8 @@ def projects():
             if any(task.status == 'Completed' for task in project.tasks):
                 allocated_completed_projects.append(project)
         
+        admin = is_admin()
+
         return render_template(
             "projects.html",
             currentUser=currentUser,
@@ -388,7 +404,8 @@ def projects():
             my_active_projects=my_active_projects,
             my_completed_projects=my_completed_projects,
             allocated_active_projects=allocated_active_projects,
-            allocated_completed_projects=allocated_completed_projects
+            allocated_completed_projects=allocated_completed_projects,
+            admin=admin
         )
     except:
         flash('Error loading Data')
@@ -399,7 +416,7 @@ def projects():
             my_active_projects=[],
             my_completed_projects=[],
             allocated_active_projects=[],
-            allocated_completed_projects=[]
+            allocated_completed_projects=[],
         )
 
 @app.route('/add-project', methods=['GET','POST'])
@@ -410,6 +427,9 @@ def add_project():
 
     project_name = request.form.get("project_name")
     assigned_to_name = request.form.get("to")
+    price_validity = request.form.get('price_validity')
+    tentative_dispatch_date = request.form.get('tdd')
+    sys_type = request.form.get('sys_type')
 
     if not project_name:
         flash("Please enter project name")
@@ -418,6 +438,18 @@ def add_project():
     assigned_user = User.query.filter_by(
         name=assigned_to_name
     ).first()
+
+    if not price_validity:
+        flash('Please Add Price Validity')
+        return redirect(url_for('projects'))
+    
+    if not tentative_dispatch_date:
+        flash('Please Add Tentative Dispatch Date')
+        return redirect(url_for('projects'))
+    
+    if not sys_type:
+        flash('Please Add Type of System')
+        return redirect(url_for('projects'))
 
     if not assigned_user:
         flash("Please select a valid user")
@@ -437,7 +469,10 @@ def add_project():
         project = Project(
             name=project_name,
             assigned_to=assigned_user.id,
-            assigned_by=session["user_id"]
+            assigned_by=session["user_id"],
+            price_validity=price_validity,
+            tentative_dispatch_date=tentative_dispatch_date,
+            sys_type=sys_type
         )
 
         db.session.add(project)
@@ -475,6 +510,189 @@ def add_project():
         flash("Error creating project")
 
     return redirect(url_for("projects"))
+
+# Admin Validation
+def is_admin():
+    if "user_id" not in session:
+        return False
+
+    user = User.query.get(session["user_id"])
+
+    return user and user.email == "mitang@user.com"
+
+# Admin Route
+@app.route("/admin")
+def admin():
+
+    if not is_admin():
+        flash("Unauthorized Access")
+        return redirect(url_for("dashboard"))
+
+    users = User.query.all()
+    projects = Project.query.all()
+    currentUser = User.query.get(session["user_id"])
+
+
+    return render_template(
+        "admin.html",
+        users=users,
+        currentUser=currentUser,
+        projects=projects
+    )
+
+# Admin User Update
+@app.route('/admin/user/<int:user_id>/update', methods=['POST'])
+def admin_update_user(user_id):
+
+    if not is_admin():
+        flash("Unauthorized Access")
+        return redirect(url_for('dashboard'))
+
+    user = User.query.get_or_404(user_id)
+
+    name = request.form.get("name")
+    email = request.form.get("email")
+
+    if not name:
+        flash("Name cannot be empty")
+        return redirect(url_for('admin'))
+
+    if not email:
+        flash("Email cannot be empty")
+        return redirect(url_for('admin'))
+
+    existing_user = User.query.filter(
+        User.email == email,
+        User.id != user_id
+    ).first()
+
+    if existing_user:
+        flash("Email already exists")
+        return redirect(url_for('admin'))
+
+    user.name = name
+    user.email = email
+
+    db.session.commit()
+
+    flash("User updated successfully")
+
+    return redirect(url_for('admin'))
+
+# Admin Project Update
+@app.route("/admin/project/<int:project_id>/update", methods=["POST"])
+def admin_update_project(project_id):
+
+    if not is_admin():
+        flash("Unauthorized Access")
+        return redirect(url_for("dashboard"))
+
+    project = Project.query.get_or_404(project_id)
+
+    project.name = request.form.get("name")
+    project.assigned_to = int(request.form.get("assigned_to"))
+
+    project.sys_type = request.form.get('sys_type')
+
+    price_validity = request.form.get("price_validity")
+    dispatch_date = request.form.get("dispatch_date")
+
+    project.price_validity = (
+        datetime.strptime(price_validity, "%Y-%m-%d").date()
+        if price_validity else None
+    )
+
+    project.tentative_dispatch_date = (
+        datetime.strptime(dispatch_date, "%Y-%m-%d").date()
+        if dispatch_date else None
+    )
+
+    db.session.commit()
+
+    flash("Project updated successfully.")
+    return redirect(url_for("admin"))
+
+# Admin Project Task Update
+@app.route("/admin/task/<int:task_id>/update", methods=["POST"])
+def admin_update_task(task_id):
+
+    if not is_admin():
+        flash("Unauthorized Access")
+        return redirect(url_for("dashboard"))
+
+    task = Task.query.get_or_404(task_id)
+
+    title = request.form.get("title")
+    assigned_to = request.form.get("assigned_to")
+    due_date = request.form.get("due_date")
+    status = request.form.get("status")
+
+    if not title:
+        flash("Task title cannot be empty")
+        return redirect(url_for("admin"))
+
+    if not assigned_to:
+        flash("Please select a user")
+        return redirect(url_for("admin"))
+
+    task.title = title
+    task.assigned_to = int(assigned_to)
+    task.status = status
+
+    if due_date:
+        task.due_date = datetime.strptime(due_date, "%Y-%m-%d").date()
+
+    if status == "Completed" and not task.completed_date:
+        task.completed_date = date.today()
+    elif status == "Pending":
+        task.completed_date = None
+
+    db.session.commit()
+
+    flash("Task updated successfully")
+    return redirect(url_for("admin"))
+
+# Admin Project Tasks Display API
+@app.route("/admin/project/<int:project_id>/data")
+def admin_project_data(project_id):
+
+    if not is_admin():
+        return jsonify({"error": "Unauthorized"}), 403
+
+    project = Project.query.get_or_404(project_id)
+
+    users = User.query.all()
+
+    return jsonify({
+
+        "id": project.id,
+        "name": project.name,
+        "assigned_to": project.assigned_to,
+        "sys_type": project.sys_type,
+        "price_validity": project.price_validity.strftime("%Y-%m-%d") if project.price_validity else "",
+        "dispatch_date": project.tentative_dispatch_date.strftime("%Y-%m-%d") if project.tentative_dispatch_date else "",
+
+        "users": [
+            {
+                "id": user.id,
+                "name": user.name
+            }
+            for user in users
+        ],
+
+        "tasks": [
+            {
+                "id": task.id,
+                "title": task.title,
+                "assigned_to": task.assigned_to,
+                "assigned_name": task.assignee.name,
+                "due_date": task.due_date.strftime("%Y-%m-%d")  if task.due_date else None,
+                "status": task.status
+            }
+            for task in project.tasks
+        ]
+
+    })
 
 #Logout
 @app.route("/logout")

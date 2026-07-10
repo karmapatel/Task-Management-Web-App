@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{background:#f3f6fc}
+.drawer{transform:translateX(100%);transition:.3s}
+.drawer.open{transform:translateX(0)}
+#task-flash {
+    width: fit-content;
+    margin: 15px auto;
+    padding: 10px 20px;
+    background-color: #E3F2FD;
+    color: #0D47A1;
+    border: 1px solid #0A3680;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+}
+</style>
+</head>
+<body class="font-sans">
+
+    <!-- Mobile top bar -->
+<div class="lg:hidden flex items-center justify-between bg-white border-b p-4">
+  <h1 class="text-xl font-bold">TaskFlow</h1>
+  <button onclick="document.getElementById('mobileNav').classList.toggle('hidden')" class="p-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+</div>
+<div id="mobileNav" class="hidden lg:hidden bg-white border-b p-4 space-y-2">
+  <button onclick="showSection('users'); document.getElementById('mobileNav').classList.add('hidden')" class="w-full text-left p-3 rounded-xl hover:bg-gray-100">Users</button>
+  <button onclick="showSection('projects'); document.getElementById('mobileNav').classList.add('hidden')" class="w-full text-left p-3 rounded-xl hover:bg-gray-100">Projects</button>
+  <a href="{{ url_for('dashboard') }}" class="block"><button class="w-full bg-blue-500 text-white p-3 rounded-xl">Dashboard</button></a>
+  <a href="{{ url_for('logout') }}" class="block"><button class="w-full bg-red-500 text-white p-3 rounded-xl">Logout</button></a>
+</div>
+
+<div class="min-h-screen flex">
+
+<aside class="w-72 bg-white border-r p-6 hidden lg:block">
+<div>
+<h1 class="text-2xl font-bold mb-8">TaskFlow</h1>
+<nav class="space-y-2">
+<!-- <button onclick="showSection('dashboard')" class="w-full text-left p-3 rounded-xl bg-blue-600 text-white">Dashboard</button> -->
+<button onclick="showSection('users')" class="w-full text-left p-3 rounded-xl hover:bg-gray-100">Users</button>
+<button onclick="showSection('projects')" class="w-full text-left p-3 rounded-xl hover:bg-gray-100">Projects</button>
+<!-- <button onclick="showSection('tasks')" class="w-full text-left p-3 rounded-xl hover:bg-gray-100">Tasks</button> -->
+</nav>
+</div>
+
+<div class="space-y-2 pt-6 border-t">
+    <a href="{{ url_for('dashboard') }}" class="block">
+      <button class="w-full bg-blue-500 text-white px-4 py-2 rounded-xl">Dashboard</button>
+    </a>
+    <a href="{{ url_for('logout') }}" class="block">
+      <button class="w-full bg-red-500 text-white px-4 py-2 rounded-xl">Logout</button>
+    </a>
+</div>
+
+</aside>
+
+<main class="flex-1 p-6">
+
+<div class="flex flex-wrap justify-between gap-3 mb-8">
+<div>
+<h1 class="text-3xl font-bold">Admin Dashboard</h1>
+</div>
+<!-- <a href="{{ url_for('dashboard') }}"><button class="bg-blue-500 text-white px-4 py-2 rounded-xl">Dashboard</button></a>
+<a href="{{ url_for('logout') }}"><button class="bg-red-500 text-white px-4 py-2 rounded-xl">Logout</button></a> -->
+</div>
+
+{% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p id="task-flash">{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+<!-- Users -->
+<div id="users">
+<div class="bg-white rounded-2xl shadow p-5">
+<h2 class="text-xl font-bold mb-4">Users</h2>
+{% if users %}
+    
+
+<div class="space-y-3">
+{% for user in users %}
+<div class="border rounded-xl p-4">
+<h3 class="font-semibold">{{user.name}}</h3>
+<p class="text-gray-500">{{user.email}}</p>
+<div class="mt-4 flex gap-2">
+<button onclick="openusrDrawer(
+        '{{ user.id }}',
+        '{{ user.name }}',
+        '{{ user.email }}')" class="bg-blue-600 text-white px-4 py-2 rounded-xl">Manage</button>
+</div>
+</div>
+{% endfor %}
+
+{%else%}
+<div class="border rounded-xl p-4">
+<h3 class="font-semibold">No users</h3>
+</div>
+</div>
+
+{% endif %}
+</div>
+</div>
+</div>
+
+<!-- Projects -->
+<div id="projects" class="hidden">
+<div class="bg-white rounded-2xl shadow p-5">
+
+<h2 class="text-xl font-bold mb-4">Projects</h2>
+
+{% if projects %}
+<div class="grid md:grid-cols-2 gap-4">
+    {% for pr in projects %}
+   
+<div class="border rounded-2xl p-4">
+<h3 class="text-lg font-bold">{{pr.name}}</h3>
+<p>Created By: {{pr.creator.name}}</p>
+<p>Assigned To: {{pr.assignee.name}}</p>
+<p>Type of System: {{pr.sys_type}}</p>
+<p>Price Validity: {{pr.price_validity}}</p>
+<p>Tentative Dispatch Date: {{pr.tentative_dispatch_date}}</p>
+
+<!-- <div class="flex gap-2 mt-3">
+<span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full">8 Tasks</span>
+<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">5 Pending</span>
+</div> -->
+
+<div class="mt-4 flex gap-2">
+<button onclick="openDrawer('{{ pr.id }}')" class="bg-blue-600 text-white px-4 py-2 rounded-xl">Manage</button>
+<!-- <button class="bg-red-500 text-white px-4 py-2 rounded-xl">Delete</button> -->
+</div>
+</div>
+{% endfor %}
+
+</div>
+{%else%}
+<p>No Data</p>
+{% endif %}
+</div>
+</div>
+
+<!-- <div id="tasks" class="hidden">
+<div class="bg-white rounded-2xl shadow p-5">
+
+<h2 class="text-xl font-bold mb-4">Tasks</h2>
+
+<div class="space-y-3">
+
+<div class="border rounded-xl p-4">
+<h3 class="font-semibold">Setup Database</h3>
+<p>Project: ERP System</p>
+<p>Assigned To: Alice</p>
+<p>Status: Pending</p>
+</div>
+
+<div class="border rounded-xl p-4">
+<h3 class="font-semibold">API Integration</h3>
+<p>Project: ERP System</p>
+<p>Assigned To: Bob</p>
+<p>Status: Completed</p>
+</div>
+
+</div>
+</div>
+</div> -->
+
+</main>
+</div>
+
+<!-- User Update Drawer -->
+<div id="usrdrawer" class="drawer fixed right-0 top-0 h-full w-full md:w-[550px] bg-white shadow-2xl overflow-y-auto">
+
+<div class="p-6 border-b flex justify-between">
+<h2 class="text-2xl font-bold">Manage User</h2>
+<button onclick="closeusrDrawer()">✕</button>
+</div>
+
+<div class="p-6">
+
+<form id="userEditForm" method="POST">
+<label class="font-medium">User Name</label>
+<input class="w-full border p-3 rounded-xl mb-4" id="edit_name" name="name" value="">
+<label class="font-medium">User Email</label>
+<input class="w-full border p-3 rounded-xl mb-4" id="edit_email" name="email" value="">
+<input type="hidden" id="edit_user_id" name="user_id">
+
+<div class="flex gap-2 mb-6">
+<button class="bg-blue-600 text-white px-4 py-3 rounded-xl">Save</button>
+</div>
+</form>
+</div></div>
+
+<!-- project Update Drawer -->
+<div id="drawer" class="drawer fixed right-0 top-0 h-full w-full md:w-[550px] bg-white shadow-2xl overflow-y-auto">
+
+<div class="p-6 border-b flex justify-between">
+<h2 class="text-2xl font-bold">Manage Project</h2>
+<button onclick="closeDrawer()">✕</button>
+</div>
+
+<div class="p-6">
+<form id="projectForm" method="POST">
+<label class="font-medium">Project Name</label>
+<input name="name" class="w-full border p-3 rounded-xl mb-4" value="" id="project_name">
+
+<label class="font-medium">Assigned User</label>
+<select name="assigned_to" class="w-full border p-3 rounded-xl mb-4" id="assigned_user">
+{% for user in users %}
+    {% if user.name != currentUser.name %}
+        <option value="{{ user.id }}">
+             {{ user.name }}
+        </option>
+    {% endif %}
+{% endfor %}
+</select>
+
+<label class="font-medium">Type of System</label>
+<input name="sys_type" class="w-full border p-3 rounded-xl mb-4" value="" id="typeofsystem">
+
+<label class="font-medium">Price Validity</label>
+<input name="price_validity" type="date" class="w-full border p-3 rounded-xl mb-4" id="price_validity">
+
+<label class="font-medium">Dispatch Date</label>
+<input name="dispatch_date" type="date" class="w-full border p-3 rounded-xl mb-6" id="dispatch_date">
+
+<div class="flex gap-2 mb-6">
+<button class="bg-blue-600 text-white px-4 py-3 rounded-xl">Save Project</button>
+<!-- <button class="bg-red-500 text-white px-4 py-3 rounded-xl">Delete Project</button> -->
+</div>
+</form>
+
+<h3 class="text-xl font-bold mb-4">Project Tasks</h3>
+<div id="taskContainer" class="space-y-4"></div>
+
+</div>
+</div>
+
+<script>
+// function showSection(id){
+// ['users','projects'].forEach(x=>{ // ,'tasks' add this if want tasks admin in dashboard in future
+// document.getElementById(x).classList.add('hidden');
+// });
+// document.getElementById(id).classList.remove('hidden');
+// }
+
+function showSection(id){
+
+    ['users','projects'].forEach(x=>{
+        document.getElementById(x).classList.add('hidden');
+    });
+
+    document.getElementById(id).classList.remove('hidden');
+
+}
+
+// function openDrawer( id,name,assigned_by,assigned_to,price_validity,dispatch_date){
+// document.getElementById('drawer').classList.add('open');
+// //  document.getElementById("drawer").classList.add("open");
+
+//     document.getElementById("project_name").value = name;
+//     document.getElementById("assigned_by").value = name;
+//     document.getElementById("assigned_to").value = assigned_to;
+//     document.getElementById("price_validity").value = price_validity;
+//     document.getElementById("dispatch_date").value = dispatch_date;
+
+//     document.getElementById("projectForm").action =
+//         "/admin/project/" + id + "/update";
+
+//     loadTasks(id);
+// }
+
+
+async function openDrawer(projectId) {
+
+    document.getElementById("drawer").classList.add("open");
+
+    console.log(projectId);
+
+    const response = await fetch(`/admin/project/${projectId}/data`);
+    const data = await response.json();
+
+    console.log(response);
+    console.log(data);
+
+    // Project Details
+    document.getElementById("project_name").value = data.name;
+    document.getElementById("assigned_user").value = data.assigned_to;
+    document.getElementById("typeofsystem").value = data.sys_type;
+    document.getElementById("price_validity").value = data.price_validity;
+    document.getElementById("dispatch_date").value = data.dispatch_date;
+
+    document.getElementById("projectForm").action =
+        `/admin/project/${projectId}/update`;
+
+    let html = "";
+
+    data.tasks.forEach(task => {
+
+        html += `
+        <div class="border rounded-xl p-4">
+
+            <div class="flex justify-between">
+
+                <div>
+                    <div class="font-semibold">${task.title}</div>
+                    <div class="text-sm text-gray-500">
+                        Assigned to ${task.assigned_name}
+                    </div>
+                </div>
+
+                <button
+                    onclick="toggleTask('task_${task.id}')"
+                    class="bg-green-600 text-white px-3 py-2 rounded-lg">
+                    Edit Task
+                </button>
+
+            </div>
+
+            <div id="task_${task.id}" class="hidden mt-4 border-t pt-4">
+
+                <form action="/admin/task/${task.id}/update" method="POST">
+
+                    <input
+                        type="text"
+                        name="title"
+                        value="${task.title}"
+                        class="w-full border p-2 rounded mb-2">
+
+                    <select
+                        name="assigned_to"
+                        class="w-full border p-2 rounded mb-2">
+
+                        ${data.users.map(user => `
+                            <option value="${user.id}"
+                            ${user.id == task.assigned_to ? "selected" : ""}>
+                                ${user.name}
+                            </option>
+                        `).join("")}
+
+                    </select>
+
+                    <input
+                        type="date"
+                        name="due_date"
+                        value="${task.due_date}"
+                        class="w-full border p-2 rounded mb-2">
+
+                    <select
+                        name="status"
+                        class="w-full border p-2 rounded mb-2">
+
+                        <option value="Pending"
+                        ${task.status=="Pending" ? "selected" : ""}>
+                            Pending
+                        </option>
+
+                        <option value="Completed"
+                        ${task.status=="Completed" ? "selected" : ""}>
+                            Completed
+                        </option>
+
+                    </select>
+
+                    <button
+                        class="bg-blue-600 text-white px-3 py-2 rounded">
+                        Save Task
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+        `;
+
+    });
+
+    document.getElementById("taskContainer").innerHTML = html;
+
+}
+
+
+function closeDrawer(){
+document.getElementById('drawer').classList.remove('open');
+}
+function openusrDrawer(id, name, email){
+document.getElementById('usrdrawer').classList.add('open');
+document.getElementById("edit_user_id").value = id;
+document.getElementById("edit_name").value = name;
+document.getElementById("edit_email").value = email;
+document.getElementById("userEditForm").action ="/admin/user/" + id + "/update";
+}
+
+function closeusrDrawer(){
+document.getElementById('usrdrawer').classList.remove('open');
+}
+
+function toggleTask(id){
+document.getElementById(id).classList.toggle('hidden');
+}
+</script>
+
+</body>
+</html>

@@ -169,6 +169,18 @@
             Projects
         </button>
     </a>
+    
+    {% if admin %}
+        
+    <a href="{{ url_for('admin') }}">
+        <button
+            class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
+            >
+            Admin Panel
+        </button>
+    </a>
+
+    {% endif %}
 </nav>
 </div>
 <div class="flex items-center gap-md">

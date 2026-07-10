@@ -153,6 +153,19 @@
             Dashboard
         </button>
     </a>
+
+    {% if admin %}
+        
+    <a href="{{ url_for('admin') }}">
+        <button
+            class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
+            >
+            Admin Panel
+        </button>
+    </a>
+
+    {% endif %}
+
 </nav>
 </div>
 <div class="flex items-center gap-md">
@@ -173,6 +186,20 @@
                 <input
                     class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all"
                     placeholder="Enter project title" type="text" name="project_name">
+                <label class="block font-label-md text-label-md text-on-surface-variant mb-xs uppercase" style="margin-top: 10px;">Type of System</label>
+                <input
+                    class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all"
+                    placeholder="Enter type of System" type="text" name="sys_type">
+                <label class="block font-label-md text-label-md text-on-surface-variant mb-xs uppercase" style="margin-top: 10px;">
+                    Price Validity</label>
+                <input
+                    class="w-full h-11 px-md border-input-border border rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md"
+                    name="price_validity" type="date" />
+                <label class="block font-label-md text-label-md text-on-surface-variant mb-xs uppercase" style="margin-top: 10px;">
+                    Tentative Dispatch Date</label>
+                <input
+                    class="w-full h-11 px-md border-input-border border rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md"
+                    name="tdd" type="date" />
             <div class="w-full md:w-64" style="margin-top: 20px;">
                 <label class="block font-label-md text-label-md text-on-surface-variant mb-xs uppercase">Assign
                     To</label>
@@ -307,6 +334,15 @@
 <div class="flex flex-wrap items-center gap-md mt-xs">
 <span class="font-body-md text-[12px] text-on-surface-variant">Assigned By: {{pr.creator.name}}</span>
 </div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Type of System: {{pr.sys_type}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Price Validity: {{pr.price_validity}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date: {{pr.tentative_dispatch_date}}</span>
+</div>
 </div>
 </div>
 <div class="flex items-center gap-md">
@@ -337,8 +373,8 @@
     <tr class="border-b border-outline-variant/50">
 <td class="p-sm font-body-md text-body-md">{{task.title}}</td>
 <td class="p-sm font-body-md text-body-md">{{task.creator.name}}</td>
-<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.created_date}}</td>
-<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.due_date}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.created_date.strftime('%d-%m-%Y') if task.created_date else '--'}}</td>
+<td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.due_date.strftime('%d-%m-%Y') if task.due_date else '--'}}</td>
 <td class="p-sm"><span class="bg-amber-200 text-amber-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">{{task.status}}</span></td>
 <td class="p-sm text-right">
 <form action="{{ url_for('complete_task_project', task_id=task.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to mark this task as completed?')">
@@ -404,6 +440,15 @@
 <h3 class="font-headline-md text-headline-md text-on-surface">{{pr.name}}</h3>
 <div class="flex flex-wrap items-center gap-md mt-xs">
 <span class="font-body-md text-[12px] text-on-surface-variant">Assigned By: {{pr.creator.name}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Type of System: {{pr.sys_type}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Price Validity: {{pr.price_validity}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date: {{pr.tentative_dispatch_date}}</span>
 </div>
 </div>
 </div>
@@ -526,6 +571,15 @@ Project Row 2 (Completed)
 <div class="flex flex-wrap items-center gap-md mt-xs">
 <span class="font-body-md text-[12px] text-on-surface-variant">Assigned To: {{pr.assignee.name}}</span>
 </div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Type of System: {{pr.sys_type}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Price Validity: {{pr.price_validity}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date: {{pr.tentative_dispatch_date}}</span>
+</div>
 </div>
 </div>
 <div class="flex items-center gap-xl">
@@ -591,6 +645,15 @@ Project Row 2 (Completed)
 <h3 class="font-headline-md text-headline-md text-on-surface">{{pr.name}}</h3>
 <div class="flex flex-wrap items-center gap-md mt-xs">
 <span class="font-body-md text-[12px] text-on-surface-variant">Assigned To: {{pr.assignee.name}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Type of System: {{pr.sys_type}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Price Validity: {{pr.price_validity}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date: {{pr.tentative_dispatch_date}}</span>
 </div>
 </div>
 </div>
