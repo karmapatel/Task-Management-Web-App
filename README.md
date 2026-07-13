@@ -1,4 +1,4 @@
-🗂️ TaskFlow - Task Management App
+🗂️ FDI TaskFlow - Task Management App
 
 - A web-based Task Management system built using Flask and PostgreSQL.
 - It allows users to create tasks/projects, assign them to other users, and update task status in dashboard interface.

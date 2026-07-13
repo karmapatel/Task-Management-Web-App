@@ -1,7 +1,7 @@
 <!DOCTYPE html><html class="light" lang="en"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Projects | TaskFlow</title>
+<title>Projects | FDI TaskFlow</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
@@ -133,7 +133,7 @@
 <header class="bg-surface w-full min-h-16 border-b border-outline-variant transition-all sticky top-0 z-50">
 <div class="flex flex-col md:flex-row justify-between items-center px-margin max-w-max-width mx-auto py-2">
 <div class="flex items-center gap-xl">
-<span class="font-headline-md text-headline-md font-bold text-primary">TaskFlow</span>
+<span class="font-headline-md text-headline-md font-bold text-primary">FDI TaskFlow</span>
 <nav class="flex flex-wrap items-center gap-2 mt-2 md:mt-0">
     <a class="font-body-md text-body-md transition-colors cursor-pointer text-secondary border-b-2 border-secondary pb-1"
        href="javascript:void(0)"
@@ -369,20 +369,25 @@
 
     {% for task in pr.tasks %}
         
-{% if task.status == "Pending" %}
+
     <tr class="border-b border-outline-variant/50">
 <td class="p-sm font-body-md text-body-md">{{task.title}}</td>
 <td class="p-sm font-body-md text-body-md">{{task.creator.name}}</td>
 <td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.created_date.strftime('%d-%m-%Y') if task.created_date else '--'}}</td>
 <td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.due_date.strftime('%d-%m-%Y') if task.due_date else '--'}}</td>
+    {% if task.status == "Pending" %}
 <td class="p-sm"><span class="bg-amber-200 text-amber-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">{{task.status}}</span></td>
 <td class="p-sm text-right">
 <form action="{{ url_for('complete_task_project', task_id=task.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to mark this task as completed?')">
 <button class="border border-secondary text-secondary px-md py-1 rounded-lg font-label-md text-[11px] hover:bg-secondary/10 transition-all">Complete Task</button>
 </form>
 </td>
-</tr>
+{%else%}
+<td class="p-sm"><span class="bg-green-200 text-green-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">{{task.status}}</span></td>
+<td class="p-sm text-right">-</td>
 {% endif %}
+</td>
+</tr>
 {% endfor %}
 
 </tbody>
@@ -476,7 +481,6 @@
 
     {% for task in pr.tasks %}
         
-{% if task.status == "Completed" %}
     <tr class="border-b border-outline-variant/50">
 <td class="p-sm font-body-md text-body-md">{{task.title}}</td>
 <td class="p-sm font-body-md text-body-md">{{task.creator.name}}</td>
@@ -487,7 +491,6 @@
 <span class="bg-green-200 text-green-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">{{task.status}}</span>   
 </td>
 </tr>
-{% endif %}
 {% endfor %}
 
 </tbody>
@@ -603,16 +606,18 @@ Project Row 2 (Completed)
 </thead>
 <tbody>
     {% for task in pr.tasks %}
-    {% if task.status == "Pending" %}
 <tr class="border-b border-outline-variant/50">
 <td class="p-sm font-body-md text-body-md">{{task.title}}</td>
 <td class="p-sm font-body-md text-body-md">{{task.assignee.name}}</td>
 <td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.created_date}}</td>
 <td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.due_date}}</td>
 <td class="p-sm font-body-md text-[12px] text-on-surface-variant">--</td>
+    {% if task.status == "Pending" %}
 <td class="p-sm text-right"><span class="bg-amber-100 text-amber-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">{{task.status}}</span></td>
-</tr>
+{%else%}
+<td class="p-sm text-right"><span class="bg-green-200 text-green-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">{{task.status}}</span></td>
 {% endif %}
+</tr>
 {% endfor %}
 </tbody>
 </table>
@@ -678,7 +683,6 @@ Project Row 2 (Completed)
 </thead>
 <tbody>
     {% for task in pr.tasks %}
-    {% if task.status == "Completed" %}
 <tr class="border-b border-outline-variant/50">
 <td class="p-sm font-body-md text-body-md">{{task.title}}</td>
 <td class="p-sm font-body-md text-body-md">{{task.assignee.name}}</td>
@@ -687,7 +691,6 @@ Project Row 2 (Completed)
 <td class="p-sm font-body-md text-[12px] text-on-surface-variant">{{task.completed_date}}</td>
 <td class="p-sm text-right"><span class="bg-green-200 text-green-700 px-sm py-0.5 rounded-full text-[11px] font-bold uppercase">{{task.status}}</span></td>
 </tr>
-{% endif %}
 {% endfor %}
 </tbody>
 </table>
@@ -705,10 +708,10 @@ Project Row 2 (Completed)
 <!-- Footer -->
 <footer class="bg-surface-container-low border-t border-outline-variant">
 <div class="flex flex-col md:flex-row justify-between items-center px-margin py-xl w-full max-w-max-width mx-auto gap-md">
-<div class="font-headline-md text-headline-md text-on-surface font-bold">TaskFlow</div><div class="font-body-md text-body-md text-on-surface-variant"><a href="mailto:karmapatel4@gmail.com" style="text-decoration: none; color: inherit;">Contact Support</a></div>
+<div class="font-headline-md text-headline-md text-on-surface font-bold">FDI TaskFlow</div><div class="font-body-md text-body-md text-on-surface-variant"><a href="mailto:karmapatel4@gmail.com" style="text-decoration: none; color: inherit;">Contact Support</a></div>
 <div class="font-body-md text-body-md text-on-surface-variant"><a href="{{ url_for('export_data') }}" style="text-decoration: none; color: inherit;">Export Data</a></div>
 <div class="font-label-md text-label-md text-on-surface-variant opacity-70">
-                © 2026 TaskFlow Made by Karma Patel.
+                © 2026 FDI TaskFlow
             </div>
 </div>
 </footer>

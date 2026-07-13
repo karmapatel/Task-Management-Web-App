@@ -380,20 +380,17 @@ def projects():
         allocated_completed_projects = []
 
 
-        for project in Project.query.filter_by(assigned_to=session['user_id']).all():
-
-            if any(task.status == "Pending" for task in project.tasks):
-                my_active_projects.append(project)
-
-            if any(task.status == "Completed" for task in project.tasks):
+        for project in Project.query.filter_by(assigned_to=session["user_id"]).all():
+            if project.tasks and all(task.status == "Completed" for task in project.tasks):
                 my_completed_projects.append(project)
+            else:
+                my_active_projects.append(project)
         
-        for project in Project.query.filter_by(assigned_by=session['user_id']).all():
-            if any(task.status == 'Pending' for task in project.tasks):
-                allocated_active_projects.append(project)
-
-            if any(task.status == 'Completed' for task in project.tasks):
+        for project in Project.query.filter_by(assigned_by=session["user_id"]).all():
+            if project.tasks and all(task.status == "Completed" for task in project.tasks):
                 allocated_completed_projects.append(project)
+            else:
+                allocated_active_projects.append(project)
         
         admin = is_admin()
 
