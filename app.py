@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for,fl
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from datetime import date,datetime
+from zoneinfo import ZoneInfo
 import os
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill
@@ -55,10 +56,10 @@ class Notification(db.Model):
     user_id = db.Column(db.Integer,db.ForeignKey("user.id"),nullable=False)
     message = db.Column(db.String(300), nullable=False)
     is_read = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime,default=datetime.utcnow)
+    created_at = db.Column(db.DateTime,default=lambda: datetime.now(ZoneInfo("Asia/Kolkata")).replace(tzinfo=None))
 
-with app.app_context():
-    db.create_all() #--> this increases cold start latency by 2-5 secs , thus create DB Manually
+# with app.app_context():
+#     db.create_all() #--> this increases cold start latency by 2-5 secs , thus create DB Manually
 
 #Login
 @app.route('/', methods=['GET','POST'])
