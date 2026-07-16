@@ -49,8 +49,16 @@ class Project(db.Model):
     assignee = db.relationship('User',foreign_keys=[assigned_to],backref='assigned_projects')
     creator = db.relationship('User',foreign_keys=[assigned_by],backref='created_projects')
 
-# with app.app_context():
-#     db.create_all() #--> this increases cold start latency by 2-5 secs , thus create DB Manually
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer,db.ForeignKey("user.id"),nullable=False)
+    message = db.Column(db.String(300), nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime,default=datetime.utcnow)
+
+with app.app_context():
+    db.create_all() #--> this increases cold start latency by 2-5 secs , thus create DB Manually
 
 #Login
 @app.route('/', methods=['GET','POST'])
@@ -241,6 +249,9 @@ def dashboard():
 
         admin = is_admin()
 
+        notifications = Notification.query.filter_by(user_id=session["user_id"]).order_by(Notification.created_at.desc()).all()
+        unread_count = Notification.query.filter_by(user_id=session["user_id"],is_read=False).count()
+
         return render_template(
             "dashboard.html",
             currentUser=currentUser,
@@ -249,7 +260,9 @@ def dashboard():
             completed=completed_tasks,
             created_pending=created_pending,
             created_completed=created_completed,
-            admin=admin
+            admin=admin,
+            notifications=notifications,
+            unread_count=unread_count
         )
     except:
         flash('Error loading Data')
@@ -260,9 +273,20 @@ def dashboard():
         pending=[],
         completed=[],
         created_pending=[],
-        created_completed=[]
+        created_completed=[],
+        notifications=[],
+        unread_count=0
     )
 
+
+def create_notification(user_id, message):
+    notification = Notification(
+        user_id=user_id,
+        message=message
+    )
+
+    db.session.add(notification)
+    db.session.commit()
 
 @app.route('/add_task', methods=['POST'])
 def add_task():
@@ -304,6 +328,11 @@ def add_task():
     db.session.add(new_task)
     db.session.commit()
 
+    create_notification(
+    assigned_user.id,
+    f"{User.query.get(session['user_id']).name} assigned you a task: {title}"
+    )
+
     flash("Task assigned successfully")
 
     return redirect(url_for('dashboard'))
@@ -325,6 +354,10 @@ def complete_task(task_id):
 
     db.session.commit()
 
+    create_notification(
+    task.assigned_by,
+    f"{task.assignee.name} completed task: {task.title}")
+
     return redirect(url_for('dashboard'))
 
 @app.route('/complete-task-project/<int:task_id>', methods=['POST'])
@@ -342,6 +375,10 @@ def complete_task_project(task_id):
     task.completed_date = date.today()
 
     db.session.commit()
+
+    create_notification(
+    task.assigned_by,
+    f"{task.assignee.name} completed project task: {task.title} of {task.project.name}")
 
     return redirect(url_for('projects'))
 
@@ -394,6 +431,10 @@ def projects():
         
         admin = is_admin()
 
+        notifications = Notification.query.filter_by(user_id=session["user_id"]).order_by(Notification.created_at.desc()).all()
+
+        unread_count = Notification.query.filter_by(user_id=session["user_id"],is_read=False).count()
+
         return render_template(
             "projects.html",
             currentUser=currentUser,
@@ -402,7 +443,9 @@ def projects():
             my_completed_projects=my_completed_projects,
             allocated_active_projects=allocated_active_projects,
             allocated_completed_projects=allocated_completed_projects,
-            admin=admin
+            admin=admin,
+            notifications=notifications,
+            unread_count=unread_count
         )
     except:
         flash('Error loading Data')
@@ -414,6 +457,8 @@ def projects():
             my_completed_projects=[],
             allocated_active_projects=[],
             allocated_completed_projects=[],
+            notifications=[],
+            unread_count=0
         )
 
 @app.route('/add-project', methods=['GET','POST'])
@@ -498,6 +543,11 @@ def add_project():
             db.session.add(task)
 
         db.session.commit()
+
+        create_notification(
+            assigned_user.id,
+            f"{User.query.get(session['user_id']).name} assigned you project: {project_name}"
+        )
 
         flash("Project created successfully")
 
@@ -699,3 +749,18 @@ def logout():
         return redirect(url_for('login'))
     else:
         return redirect(url_for('login'))
+
+@app.route("/notifications/read", methods=["POST"])
+def mark_notifications_read():
+
+    if "user_id" not in session:
+        return {"success": False}, 401
+
+    Notification.query.filter_by(
+        user_id=session["user_id"],
+        is_read=False
+    ).update({"is_read": True})
+
+    db.session.commit()
+
+    return {"success": True}

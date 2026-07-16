@@ -142,8 +142,10 @@
 <body class="bg-background text-on-surface font-body-md antialiased">
 <!-- TopNavBar Component -->
 <header class="bg-surface-container-lowest border-b border-outline-variant fixed top-0 left-0 w-full z-50 min-h-16">
-<div class="flex flex-col md:flex-row justify-between items-center w-full px-margin py-2 max-w-max-width mx-auto">
-<div class="flex items-center gap-xl">
+<!-- <div class="flex flex-col md:flex-row justify-between items-center w-full px-margin py-2 max-w-max-width mx-auto"> -->
+<div class="flex flex-wrap justify-between items-center gap-4 w-full px-margin py-2 max-w-max-width mx-auto">
+<!-- <div class="flex items-center gap-xl"> -->
+<div class="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-xl flex-1">
 <div class="flex items-center gap-sm">
 <!-- <img alt="Logo" class="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLvK2fvhGH9MrPg5Ch8M30QoB0yXBYZhz8CTc1O3eQyiMtJS1Bwptc7ub5drEvQqxph8IqayYk5J-XbcbEi6aFS-Jxm7bIRbcs0hvz67Qu0xXaAlcIsTLEohqBiLqCFThg2awaP5BsmXsriuMv6kfoKxgourDSSm9hxDPGnUS8d-i7f2_jdVev_4J8A8F_4zt_Z47X-szKPlN_f9VGTnPKhq9jmH0DqTUZrMIIqnYPla0zzXPe_Ps4aY1uU"/> -->
 <span class="text-headline-md font-headline-md font-bold text-secondary">FDI TaskFlow</span>
@@ -183,13 +185,97 @@
     {% endif %}
 </nav>
 </div>
-<div class="flex items-center gap-md">
-<button class="text-body-md font-label-md text-on-surface-variant hover:text-error transition-colors px-sm py-xs"><a href="{{ url_for('logout') }}">Logout</a></button>
+<div class="flex items-center gap-4">
+
+    <!-- Notification -->
+    <div class="relative">
+
+        <button
+            id="notificationBtn"
+            class="relative p-2 rounded-lg hover:bg-surface-container-high transition">
+
+            <span class="material-symbols-outlined text-[28px]">
+                notifications
+            </span>
+
+            {% if unread_count > 0 %}
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[11px] min-w-[18px] h-[18px] flex items-center justify-center">
+                {{ unread_count }}
+            </span>
+            {% endif %}
+
+        </button>
+
+        <!-- Dropdown -->
+        <div
+            id="notificationDropdown"
+            class="hidden
+           fixed left-4 right-4 top-20
+           md:absolute md:top-full md:right-0 md:left-auto md:mt-3 md:w-96
+           max-h-[450px]
+           overflow-y-auto
+           bg-white
+           border border-gray-200
+           rounded-xl
+           shadow-xl
+           z-50">
+
+            <div class="px-4 py-3 font-semibold border-b">
+                Notifications
+            </div>
+
+            {% if notifications %}
+
+                {% for notification in notifications %}
+
+                <div class="px-4 py-3 border-b hover:bg-gray-50">
+
+                    <div class="flex justify-between">
+
+                        <p class="text-sm text-gray-800">
+
+                            {{ notification.message }}
+
+                        </p>
+
+                        {% if not notification.is_read %}
+                        <div class="w-2 h-2 bg-blue-600 rounded-full mt-2 ml-2"></div>
+                        {% endif %}
+
+                    </div>
+
+                    <p class="text-xs text-gray-500 mt-1">
+
+                        {{ notification.created_at.strftime("%d %b %Y %I:%M %p") }}
+
+                    </p>
+
+                </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="text-center text-gray-500 py-8">
+                    No notifications
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- Logout -->
+    <button class="text-body-md font-label-md text-on-surface-variant hover:text-error transition-colors px-sm py-xs">
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </button>
+
 </div>
 </div>
 </header>
 <!-- Main Content Area - Full Width -->
-<main class="pt-40 md:pt-24 pb-margin px-margin max-w-max-width mx-auto min-h-screen" >
+<main class="pt-52 md:pt-24 pb-margin px-margin max-w-max-width mx-auto min-h-screen" >
 <!-- Welcome Section -->
 <section class="mb-xl">
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
@@ -235,6 +321,24 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+
+<!-- Search Bar -->
+
+<div class="mb-6">
+    <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+            search
+        </span>
+
+        <input
+            id="taskSearch"
+            type="text"
+            placeholder="Search tasks..."
+            class="w-full pl-10 pr-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all"
+        >
+    </div>
+</div>
+
 <!-- Dashboard Content -->
 <div class="grid grid-cols-1 gap-xl">
 <!-- Section 1: My Tasks -->
@@ -253,7 +357,7 @@
 <div class="collapse-content space-y-xs" id="my-pending-content" style="max-height: 2000px;">
 {% if pending %}
 {% for task in pending %}
-<div class="task-card group bg-surface-container-lowest border border-outline-variant hover:border-secondary rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all cursor-pointer">
+<div class="task-card group bg-surface-container-lowest border border-outline-variant hover:border-secondary rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all cursor-pointer" data-task="{{ task.title|lower }}">
 <div class="flex-1 min-w-[200px]">
 <p class="text-body-lg font-bold text-on-surface group-hover:text-secondary transition-colors">{{ task.title }}</p>
 <p class="text-body-md text-on-surface-variant mt-1">Assigned by <strong>{{ task.creator.name }}</strong></p></div>
@@ -304,7 +408,7 @@
 <div class="collapse-content space-y-xs collapsed" id="my-completed-content">
 {% if completed %}
 {% for task in completed %}
-<div class="task-card bg-surface-container-low/50 border border-outline-variant/50 rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all opacity-70 hover:opacity-100">
+<div class="task-card bg-surface-container-low/50 border border-outline-variant/50 rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all opacity-70 hover:opacity-100" data-task="{{ task.title|lower }}">
 <div class="flex-1 min-w-[200px]">
 <p class="text-body-lg font-bold text-on-surface">{{ task.title }}</p>
 <p class="text-body-md text-on-surface-variant mt-1">Assigned by <strong>{{ task.creator.name }}</strong></p></div>
@@ -350,7 +454,7 @@
 <div class="collapse-content space-y-xs" id="allocated-pending-content" style="max-height: 2000px;">
 {% if created_pending %}
 {% for task in created_pending %}
-<div class="task-card bg-surface-container-lowest border border-outline-variant hover:border-secondary rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all cursor-pointer">
+<div class="task-card bg-surface-container-lowest border border-outline-variant hover:border-secondary rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all cursor-pointer" data-task="{{ task.title|lower }}">
 <div class="flex-1 min-w-[200px]">
 <div class="flex items-center gap-sm mb-1">
 <p class="text-body-lg font-bold text-on-surface">{{task.title}}</p>
@@ -390,7 +494,7 @@
 <div class="collapse-content space-y-xs collapsed" id="allocated-completed-content">
 {% if created_completed %}
 {% for task in created_completed %}
-<div class="task-card bg-surface-container-low/50 border border-outline-variant/50 rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all opacity-70 hover:opacity-100">
+<div class="task-card bg-surface-container-low/50 border border-outline-variant/50 rounded-lg p-md flex flex-col md:flex-row items-start md:items-center gap-lg transition-all opacity-70 hover:opacity-100" data-task="{{ task.title|lower }}">
 <div class="flex-1 min-w-[200px]">
 <p class="text-body-lg font-bold text-on-surface">{{ task.title }}</p>
 <p class="text-body-md text-on-surface-variant mt-1">Assigned to <strong>{{ task.assignee.name }}</strong></p></div>
@@ -483,5 +587,61 @@
         myTasksSection.classList.add('hidden');
         allocatedTasksSection.classList.remove('hidden');
     });
+
+    // Search Bar Implementation
+    const taskSearch = document.getElementById("taskSearch");
+
+    taskSearch.addEventListener("input", function () {
+
+    const value = this.value.toLowerCase().trim();
+
+    const visibleSection = document.querySelector(
+        "#my-tasks-section:not(.hidden), #allocated-tasks-section:not(.hidden)"
+    );
+
+    visibleSection.querySelectorAll(".task-card").forEach(card => {
+
+        const title = card.dataset.task;
+
+        card.style.display = title.includes(value) ? "" : "none";
+
+    });
+
+    });
+
+    // Notification Implementation
+
+    const notificationBtn = document.getElementById("notificationBtn");
+    const notificationDropdown = document.getElementById("notificationDropdown");
+
+    notificationBtn.addEventListener("click", function (e) {
+
+    e.stopPropagation();
+
+    notificationDropdown.classList.toggle("hidden");
+
+    if (!notificationDropdown.classList.contains("hidden")) {
+
+        fetch("/notifications/read", {
+            method: "POST"
+        });
+
+        // Remove the red badge immediately
+        const badge = notificationBtn.querySelector("span.absolute");
+        if (badge) badge.remove();
+
+        // Remove blue dots
+        document.querySelectorAll("#notificationDropdown .bg-blue-600")
+            .forEach(dot => dot.remove());
+    }
+
+});
+
+    document.addEventListener("click", function(){
+
+        notificationDropdown.classList.add("hidden");
+
+    });
+
 </script>
 </body></html>

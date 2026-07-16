@@ -130,50 +130,137 @@
 </head>
 <body class="flex flex-col min-h-screen">
 <!-- Top Navigation Bar -->
-<header class="bg-surface w-full min-h-16 border-b border-outline-variant transition-all sticky top-0 z-50">
-<div class="flex flex-col md:flex-row justify-between items-center px-margin max-w-max-width mx-auto py-2">
-<div class="flex items-center gap-xl">
-<span class="font-headline-md text-headline-md font-bold text-primary">FDI TaskFlow</span>
-<nav class="flex flex-wrap items-center gap-2 mt-2 md:mt-0">
-    <a class="font-body-md text-body-md transition-colors cursor-pointer text-secondary border-b-2 border-secondary pb-1"
-       href="javascript:void(0)"
-       id="navMyProjects">
-        My Projects
-    </a>
 
-    <a class="font-body-md text-body-md transition-colors cursor-pointer text-on-surface-variant hover:text-secondary"
-       href="javascript:void(0)"
-       id="navAllocatedProjects">
-        Allocated Projects
-    </a>
+<header class="bg-surface border-b border-outline-variant sticky top-0 z-50">
+    <div class="max-w-max-width mx-auto px-margin py-3">
 
-    <a href="{{url_for('dashboard')}}">
-        <button class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
-                id="navAllocatedTasks">
-            Dashboard
-        </button>
-    </a>
+        <!-- Top Row -->
+        <div class="flex items-center justify-between">
 
-    {% if admin %}
-        
-    <a href="{{ url_for('admin') }}">
-        <button
-            class="text-label-md font-bold px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
-            >
-            Admin Panel
-        </button>
-    </a>
+            <!-- Logo -->
+            <span class="font-headline-md text-headline-md font-bold text-primary">
+                FDI TaskFlow
+            </span>
 
-    {% endif %}
+            <!-- Right Side -->
+            <div class="flex items-center gap-4">
 
-</nav>
-</div>
-<div class="flex items-center gap-md">
+                <!-- Notification -->
+                <div class="relative">
 
-<button class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors cursor-pointer active:opacity-80"><a href="{{ url_for('logout') }}">Logout</a></button>
-</div>
-</div>
+                    <button
+                        id="notificationBtn"
+                        class="relative p-2 rounded-lg hover:bg-surface-container-high transition">
+
+                        <span class="material-symbols-outlined">
+                            notifications
+                        </span>
+
+                        {% if unread_count > 0 %}
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[11px] min-w-[18px] h-[18px] flex items-center justify-center">
+                            {{ unread_count }}
+                        </span>
+                        {% endif %}
+
+                    </button>
+
+                    <div
+                        id="notificationDropdown"
+                        class="hidden
+       fixed top-16 left-4 right-4
+       md:absolute md:top-full md:right-0 md:left-auto
+       md:mt-2 md:w-96
+       bg-white border border-outline-variant rounded-xl shadow-xl
+       max-h-[450px] overflow-y-auto z-50">
+
+                        <div class="px-4 py-3 font-semibold border-b">
+                            Notifications
+                        </div>
+
+                        {% if notifications %}
+
+                            {% for notification in notifications %}
+
+                            <div class="px-4 py-3 border-b hover:bg-surface-container-low">
+
+                                <div class="flex justify-between gap-2">
+
+                                    <p class="text-sm text-gray-800">
+                                        {{ notification.message }}
+                                    </p>
+
+                                    {% if not notification.is_read %}
+                                    <div class="w-2 h-2 bg-blue-600 rounded-full mt-2 shrink-0"></div>
+                                    {% endif %}
+
+                                </div>
+
+                                <p class="text-xs text-gray-500 mt-1">
+                                    {{ notification.created_at.strftime("%d %b %Y %I:%M %p") }}
+                                </p>
+
+                            </div>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <div class="text-center text-gray-500 py-8">
+                                No notifications
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- Logout -->
+                <a href="{{ url_for('logout') }}"
+                   class="font-body-md text-on-surface-variant hover:text-secondary">
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex flex-wrap gap-2 mt-4">
+
+            <a
+                id="navMyProjects"
+                href="javascript:void(0)"
+                class="font-body-md text-secondary border-b-2 border-secondary pb-1">
+                My Projects
+            </a>
+
+            <a
+                id="navAllocatedProjects"
+                href="javascript:void(0)"
+                class="font-body-md text-on-surface-variant hover:text-secondary">
+                Allocated Projects
+            </a>
+
+            <a href="{{ url_for('dashboard') }}">
+                <button class="text-label-md font-bold px-md py-sm rounded-lg hover:bg-surface-container-high">
+                    Dashboard
+                </button>
+            </a>
+
+            {% if admin %}
+            <a href="{{ url_for('admin') }}">
+                <button class="text-label-md font-bold px-md py-sm rounded-lg hover:bg-surface-container-high">
+                    Admin Panel
+                </button>
+            </a>
+            {% endif %}
+
+        </nav>
+
+    </div>
 </header>
+
 <!-- Main Content -->
 <main class="flex-grow max-w-max-width mx-auto w-full px-margin py-xl">
 <!-- Quick Create Project Bar -->
@@ -307,6 +394,21 @@
 <header class="mb-lg">
 <h1 class="font-headline-lg text-headline-lg text-on-background">Project Management</h1>
 </header>
+<!-- Search Bar -->
+<div class="mb-6">
+    <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+            search
+        </span>
+
+        <input
+            id="projectSearch"
+            type="text"
+            placeholder="Search projects..."
+            class="w-full pl-10 pr-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all"
+        >
+    </div>
+</div>
 <!-- My Projects Section -->
 <section class="mb-xl" id="my-projects-section">
 <div class="flex items-center gap-sm mb-md">
@@ -326,7 +428,7 @@
 <!-- Project Row 1 -->
  {% for pr in my_active_projects %}
     
-<div class="project-row bg-white border-b border-outline-variant p-md flex flex-col group">
+<div class="project-row bg-white border-b border-outline-variant p-md flex flex-col group" data-project="{{ pr.name|lower }}">
 <div class="flex items-center justify-between w-full">
 <div class="flex items-center gap-lg flex-grow">
 <div>
@@ -438,7 +540,7 @@
 <!-- Project Row 1 -->
  {% for pr in my_completed_projects %}
     
-<div class="project-row bg-white border-b border-outline-variant p-md flex flex-col group">
+<div class="project-row bg-white border-b border-outline-variant p-md flex flex-col group" data-project="{{ pr.name|lower }}">
 <div class="flex items-center justify-between w-full">
 <div class="flex items-center gap-lg flex-grow">
 <div>
@@ -566,7 +668,7 @@ Project Row 2 (Completed)
     {% for pr in allocated_active_projects %}
         
     
-<div class="project-row bg-white border border-outline-variant rounded-lg p-md flex flex-col hover:border-secondary transition-all group">
+<div class="project-row bg-white border border-outline-variant rounded-lg p-md flex flex-col hover:border-secondary transition-all group" data-project="{{ pr.name|lower }}">
 <div class="flex items-center justify-between w-full">
 <div class="flex items-center gap-lg flex-grow">
 <div>
@@ -643,7 +745,7 @@ Project Row 2 (Completed)
     {% for pr in allocated_completed_projects %}
         
     
-<div class="project-row bg-white border border-outline-variant rounded-lg p-md flex flex-col hover:border-secondary transition-all group">
+<div class="project-row bg-white border border-outline-variant rounded-lg p-md flex flex-col hover:border-secondary transition-all group" data-project="{{ pr.name|lower }}">
 <div class="flex items-center justify-between w-full">
 <div class="flex items-center gap-lg flex-grow">
 <div>
@@ -836,6 +938,67 @@ Project Row 2 (Completed)
 
     navMyProjects.addEventListener('click', showMyProjects);
     navAllocatedProjects.addEventListener('click', showAllocatedProjects);
+
+    // Search Implementation
+    const searchInput = document.getElementById("projectSearch");
+
+    searchInput.addEventListener("input", function () {
+
+    const value = this.value.toLowerCase().trim();
+
+    document.querySelectorAll(".project-row").forEach(project => {
+
+        const name = project.dataset.project;
+
+        if (name.includes(value)) {
+            project.style.display = "";
+        } else {
+            project.style.display = "none";
+        }
+
+    });
+
+});
+
+// Notification Implementation
+
+// Notification Dropdown
+const notificationBtn = document.getElementById("notificationBtn");
+const notificationDropdown = document.getElementById("notificationDropdown");
+
+if (notificationBtn && notificationDropdown) {
+
+    notificationBtn.addEventListener("click", function (e) {
+
+    e.stopPropagation();
+
+    notificationDropdown.classList.toggle("hidden");
+
+    if (!notificationDropdown.classList.contains("hidden")) {
+
+        fetch("/notifications/read", {
+            method: "POST"
+        });
+
+        // Remove the red badge immediately
+        const badge = notificationBtn.querySelector("span.absolute");
+        if (badge) badge.remove();
+
+        // Remove blue dots
+        document.querySelectorAll("#notificationDropdown .bg-blue-600")
+            .forEach(dot => dot.remove());
+    }
+
+});
+
+    document.addEventListener("click", function () {
+
+        notificationDropdown.classList.add("hidden");
+
+    });
+
+}
+
 </script>
 
 
