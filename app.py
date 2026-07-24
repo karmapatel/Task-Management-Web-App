@@ -566,7 +566,7 @@ def is_admin():
 
     user = User.query.get(session["user_id"])
 
-    return user and user.email == "mitang@user.com"
+    return user and user.email == "mitang@fdipl.com"
 
 # Admin Route
 @app.route("/admin")
