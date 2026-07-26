@@ -283,10 +283,15 @@
                     class="w-full h-11 px-md border-input-border border rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md"
                     name="price_validity" type="date" />
                 <label class="block font-label-md text-label-md text-on-surface-variant mb-xs uppercase" style="margin-top: 10px;">
-                    Tentative Dispatch Date</label>
+                    Tentative Dispatch Date as per WO</label>
                 <input
                     class="w-full h-11 px-md border-input-border border rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md"
                     name="tdd" type="date" />
+                <label class="block font-label-md text-label-md text-on-surface-variant mb-xs uppercase" style="margin-top: 10px;">
+                    Tentative Dispatch Plan as Actual</label>
+                <input
+                    class="w-full h-11 px-md border-input-border border rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all text-body-md"
+                    name="tdp" type="date" />
             <div class="w-full md:w-64" style="margin-top: 20px;">
                 <label class="block font-label-md text-label-md text-on-surface-variant mb-xs uppercase">Assign
                     To</label>
@@ -443,7 +448,10 @@
 <span class="font-body-md text-[12px] text-on-surface-variant">Price Validity: {{pr.price_validity}}</span>
 </div>
 <div class="flex flex-wrap items-center gap-md mt-xs">
-<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date: {{pr.tentative_dispatch_date}}</span>
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date as per WO: {{pr.tentative_dispatch_date_wo}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Plan as Actual: {{pr.tentative_dispatch_plan_actual}}</span>
 </div>
 </div>
 </div>
@@ -555,7 +563,10 @@
 <span class="font-body-md text-[12px] text-on-surface-variant">Price Validity: {{pr.price_validity}}</span>
 </div>
 <div class="flex flex-wrap items-center gap-md mt-xs">
-<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date: {{pr.tentative_dispatch_date}}</span>
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date as per WO: {{pr.tentative_dispatch_date_wo}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Plan as Actual: {{pr.tentative_dispatch_plan_actual}}</span>
 </div>
 </div>
 </div>
@@ -683,7 +694,10 @@ Project Row 2 (Completed)
 <span class="font-body-md text-[12px] text-on-surface-variant">Price Validity: {{pr.price_validity}}</span>
 </div>
 <div class="flex flex-wrap items-center gap-md mt-xs">
-<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date: {{pr.tentative_dispatch_date}}</span>
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date as per WO: {{pr.tentative_dispatch_date_wo}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Plan as Actual: {{pr.tentative_dispatch_plan_actual}}</span>
 </div>
 </div>
 </div>
@@ -760,7 +774,10 @@ Project Row 2 (Completed)
 <span class="font-body-md text-[12px] text-on-surface-variant">Price Validity: {{pr.price_validity}}</span>
 </div>
 <div class="flex flex-wrap items-center gap-md mt-xs">
-<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date: {{pr.tentative_dispatch_date}}</span>
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Date as per WO: {{pr.tentative_dispatch_date_wo}}</span>
+</div>
+<div class="flex flex-wrap items-center gap-md mt-xs">
+<span class="font-body-md text-[12px] text-on-surface-variant">Tentative Dispatch Plan as Actual: {{pr.tentative_dispatch_plan_actual}}</span>
 </div>
 </div>
 </div>

@@ -44,8 +44,9 @@ class Project(db.Model):
     assigned_to = db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
     assigned_by = db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
     price_validity = db.Column(db.Date,nullable=True)
-    tentative_dispatch_date = db.Column(db.Date,nullable=False)
-    sys_type = db.Column(db.String(200),nullable=False)
+    tentative_dispatch_date_wo = db.Column(db.Date,nullable=True)
+    tentative_dispatch_plan_actual = db.Column(db.Date,nullable=True)
+    sys_type = db.Column(db.String(200),nullable=True)
     tasks = db.relationship('Task',backref='project',lazy=True,cascade='all, delete')
     assignee = db.relationship('User',foreign_keys=[assigned_to],backref='assigned_projects')
     creator = db.relationship('User',foreign_keys=[assigned_by],backref='created_projects')
@@ -115,7 +116,7 @@ def export_data():
     # --- Sheet 1: Projects ---
     ws_p = wb.active
     ws_p.title = "Projects"
-    ws_p.append(["Sr No.","Project Name", "Assigned By", "Assigned To", "Type Of System", "Price Validity", "Tentative Dispatch Date", "Total Tasks", "Pending", "Completed", "Created Date", "Due Date", "Completed Date"])
+    ws_p.append(["Sr No.","Project Name", "Assigned By", "Assigned To", "Type Of System", "Price Validity", "Tentative Dispatch Date as per WO", "Tentative Dispatch Plan as Actual","Total Tasks", "Pending", "Completed", "Created Date", "Due Date", "Completed Date"])
     for cell in ws_p[1]:
         cell.font = Font(bold=True)
  
@@ -143,7 +144,8 @@ def export_data():
             p.assignee.name,   # Assigned To
             p.sys_type,
             p.price_validity,
-            p.tentative_dispatch_date,
+            p.tentative_dispatch_date_wo,
+            p.tentative_dispatch_plan_actual,
             len(p.tasks),
             pending,
             completed,
@@ -161,6 +163,7 @@ def export_data():
                 f"{t.title}",
                 "",
                 "", "",
+                "",
                 "",
                 "",
                 "",                                      # Total Tasks (blank for task rows)
@@ -471,7 +474,8 @@ def add_project():
     project_name = request.form.get("project_name")
     assigned_to_name = request.form.get("to")
     price_validity = request.form.get('price_validity')
-    tentative_dispatch_date = request.form.get('tdd')
+    tentative_dispatch_date_wo = request.form.get('tdd')
+    tentative_dispatch_plan_actual = request.form.get('tdp')
     sys_type = request.form.get('sys_type')
 
     if not project_name:
@@ -486,10 +490,13 @@ def add_project():
         flash('Please Add Price Validity')
         return redirect(url_for('projects'))
     
-    if not tentative_dispatch_date:
-        flash('Please Add Tentative Dispatch Date')
+    if not tentative_dispatch_date_wo:
+        flash('Please Add Tentative Dispatch Date as per WO')
         return redirect(url_for('projects'))
     
+    if not tentative_dispatch_plan_actual:
+        flash('Please Add Tentative dispatch plan as Actual')
+
     if not sys_type:
         flash('Please Add Type of System')
         return redirect(url_for('projects'))
@@ -514,7 +521,8 @@ def add_project():
             assigned_to=assigned_user.id,
             assigned_by=session["user_id"],
             price_validity=price_validity,
-            tentative_dispatch_date=tentative_dispatch_date,
+            tentative_dispatch_date_wo=tentative_dispatch_date_wo,
+            tentative_dispatch_plan_actual=tentative_dispatch_plan_actual,
             sys_type=sys_type
         )
 
@@ -644,15 +652,21 @@ def admin_update_project(project_id):
 
     price_validity = request.form.get("price_validity")
     dispatch_date = request.form.get("dispatch_date")
+    dispatch_date_actual = request.form.get("dispatch_date_actual")
 
     project.price_validity = (
         datetime.strptime(price_validity, "%Y-%m-%d").date()
         if price_validity else None
     )
 
-    project.tentative_dispatch_date = (
+    project.tentative_dispatch_date_wo = (
         datetime.strptime(dispatch_date, "%Y-%m-%d").date()
         if dispatch_date else None
+    )
+
+    project.tentative_dispatch_plan_actual = (
+        datetime.strptime(dispatch_date_actual, "%Y-%m-%d").date()
+        if dispatch_date_actual else None
     )
 
     db.session.commit()
@@ -718,7 +732,8 @@ def admin_project_data(project_id):
         "assigned_to": project.assigned_to,
         "sys_type": project.sys_type,
         "price_validity": project.price_validity.strftime("%Y-%m-%d") if project.price_validity else "",
-        "dispatch_date": project.tentative_dispatch_date.strftime("%Y-%m-%d") if project.tentative_dispatch_date else "",
+        "dispatch_date": project.tentative_dispatch_date_wo.strftime("%Y-%m-%d") if project.tentative_dispatch_date_wo else "",
+        "dispatch_date_actual": project.tentative_dispatch_plan_actual.strftime("%Y-%m-%d") if project.tentative_dispatch_plan_actual else "",
 
         "users": [
             {
